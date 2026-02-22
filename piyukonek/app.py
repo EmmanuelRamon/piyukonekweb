@@ -81,7 +81,7 @@ app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') or ('' if _is_production else 'piyukonekwebsite@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or ('' if _is_production else 'ghkg yxxz nzow pgjd')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or ('' if _is_production else 'yruq iynh jgtv rdnw')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER') or app.config['MAIL_USERNAME'] or 'piyukonekwebsite@gmail.com'
 
 # API Keys (from env vars - never commit real keys)
