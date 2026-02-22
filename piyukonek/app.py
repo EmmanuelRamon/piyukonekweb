@@ -1,3 +1,5 @@
+import pymysql
+pymysql.install_as_MySQLdb()
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message as MailMessage
