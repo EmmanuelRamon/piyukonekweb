@@ -661,16 +661,13 @@ def register_student():
         session['otp'] = otp
 
         try:
-            if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
-                flash("Email not configured. Add MAIL_USERNAME and MAIL_PASSWORD to .env (see .env.example)", "danger")
-            else:
-                msg = MailMessage('Your OTP Verification Code', recipients=[email])
-                msg.body = f"Hello {fullname},\n\nYour OTP code is: {otp}\n\nThank you for registering."
-                mail.send(msg)
-                flash("OTP has been sent to your email address.", "info")
+            msg = MailMessage('Your OTP Verification Code', recipients=[email])
+            msg.body = f"Hello {fullname},\n\nYour OTP code is: {otp}\n\nThank you for registering."
+            mail.send(msg)
+            flash("OTP has been sent to your email address.", "info")
         except Exception as e:
-            print(f"[MAIL ERROR] {e}")
-            flash("Failed to send OTP. Check .env has correct MAIL_USERNAME, MAIL_PASSWORD (Gmail App Password).", "danger")
+            print(f"MAIL ERROR: {e}")
+            flash("Failed to send OTP. Please check your internet or email settings.", "danger")
 
         return render_template('accounts/students_otp.html')
 
