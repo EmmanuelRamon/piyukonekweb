@@ -660,7 +660,7 @@ def register_student():
         }
         session['otp'] = otp
 
-          try:
+        try:
             if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
                 flash("Email not configured. Add MAIL_USERNAME and MAIL_PASSWORD to .env (see .env.example)", "danger")
             else:
