@@ -1,0 +1,81 @@
+System Functionalities by User Type
+
+1. Student
+
+Students have access to the following functionalities:
+- Register for an account with OTP email verification.
+- Log in and log out of the system.
+- View a personalized dashboard displaying concern statistics and recent activity.
+- Submit new concerns (support tickets) regarding academic, financial, administrative, or personal issues, with the ability to attach relevant documents.
+- View the status and details of all submitted concerns.
+- Receive notifications about concern updates, system messages, and general announcements.
+- Mark notifications as read or delete them.
+- Communicate directly with SSC staff and administrators through a built-in chat feature, supporting both text and file attachments.
+- Have their online status tracked and displayed within the system.
+- Utilize an AI-powered chatbot to analyze their concerns and receive automated advice or solutions.
+
+2. SSC (Student Support Center Staff)
+
+SSC staff members can:
+- Register for an account with OTP email verification.
+- Log in and log out of the system.
+- Access a dashboard with statistics on all student concerns (pending, processing, resolved).
+- View, search, and filter all student concerns.
+- Respond to concerns by providing notes and setting their status to "processing."
+- Mark concerns as resolved with appropriate resolution notes.
+- View detailed information about each student and concern.
+- View Audit Trail (Activity Log) per concern: record ng lahat ng actions (sino nag-submit, kailan binago ang priority, sino nag-review, kailan na-resolve) for transparency and accountability.
+- Receive notifications about concern updates and system messages.
+- View and mark notifications as read.
+- Communicate with students and administrators via the messaging feature, supporting text and file attachments.
+- Delete conversations with students as needed.
+- View and search the list of all students, including their online status and profile details.
+- Upload a profile image during registration.
+
+3. Administrator
+
+Administrators are provided with the following functionalities:
+- Register for an account with OTP email verification.
+- Log in and log out of the system.
+- Access a comprehensive dashboard displaying statistics on users and concerns, as well as recent activities.
+- View, search, and filter all users (students, SSC staff, and other admins).
+- Approve or reject new student and SSC registrations.
+- Manage user statuses, such as online or offline.
+- View, filter, and sort all concerns.
+- Access detailed information about each concern.
+- View Audit Trail (Activity Log) per concern: record ng lahat ng actions (sino nag-submit, kailan binago ang priority, sino nag-review, kailan na-resolve) for transparency and accountability.
+- Mark concerns as resolved or rejected.
+- Receive notifications about new registrations and concern updates.
+- View a complete feed of recent activities and notifications.
+- Communicate with students via the messaging system, view conversation histories, send and receive messages, and delete conversations as necessary.
+- Upload and update their profile image.
+
+4. General and Shared Functionalities
+
+All users benefit from:
+- Secure authentication, including login and logout.
+- Session-based access control, ensuring users can only access pages appropriate to their role.
+- File uploads and downloads, allowing users to attach documents to concerns or messages and retrieve uploaded files as needed.
+- Online status tracking for students, viewable by SSC staff and administrators.
+- Utilities for testing the database connection (for development and maintenance purposes). 
+
+
+Suggested New Functions by User Type
+
+1. Student – Suggested Function
+Feature:
+Concern Status Tracking with Real-Time Updates
+Description:
+Allow students to receive real-time updates (via web notifications or email) whenever the status of their submitted concern changes (e.g., from "pending" to "processing" or "resolved"). This could include a timeline view showing all actions taken on their concern.
+
+2. SSC (Student Support Center Staff) – Suggested Function
+Feature:
+Bulk Concern Management Tools
+Description:
+Enable SSC staff to select multiple concerns and perform batch actions, such as marking several concerns as "processing" or "resolved" at once, or sending a bulk message to students with similar issues. This would streamline their workflow, especially during peak periods.
+
+3. Administrator – Suggested Function
+Feature:
+Analytics and Reporting Dashboard
+Description:
+Provide administrators with a dedicated analytics dashboard that visualizes trends such as the number of concerns submitted over time, average resolution time, user registration growth, and most common concern types. Allow exporting of reports in PDF or Excel format for institutional use. 

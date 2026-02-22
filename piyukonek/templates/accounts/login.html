@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: url("{{ url_for('static', filename='images/lspu.jfif') }}") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .login-container {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      color: #333;
+      display: flex;
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-left {
+      flex: 1.2;
+      background: linear-gradient(rgba(253, 255, 254, 0.744), rgba(0, 255, 8, 0.54)), url("{{ url_for('static', filename='images/lspu.jfif') }}") no-repeat center center;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      border-radius: 15px 0 0 15px;
+    }
+
+    .login-left img {
+      max-width: 80%;
+      height: auto;
+      border-radius: 10px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .login-left img:hover {
+      transform: scale(1.03);
+    }
+
+    .login-left > div {
+      margin-top: 20px;
+    }
+
+    .login-left h2, .login-left p {
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-right {
+      flex: 2;
+      background-color: #ffffff;
+      padding: 2.5rem;
+      border-radius: 0 15px 15px 0;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+      font-size: 2.2rem;
+      color: #000000;
+      margin-bottom: 0.7rem;
+    }
+
+    .login-header p {
+      color: #000000;
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .form-group label {
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .form-group input {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      background-color: #f9f9f9;
+      color: #333;
+      padding-left: 2.5rem;
+      width: 100%;
+    }
+
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-container i {
+      position: absolute;
+      left: 1rem;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border: 1px solid #000000;
+      background-color: #ffffff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-button {
+      background: linear-gradient(to right, #4CAF50, #8BC34A);
+      color: #fff;
+      font-weight: bold;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-button:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .signup-text {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .signup-text a {
+      color: #6b48ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .signup-text a:hover {
+      color: #5536e0;
+      text-decoration: underline;
+    }
+
+    .flash-message {
+      text-align: center;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    .flash-success {
+      color: green;
+    }
+
+    .flash-error {
+      color: red;
+    }
+
+    /* Enhanced Mobile Responsive Design */
+    @media (max-width: 1024px) {
+      .login-container {
+        max-width: 90%;
+        margin: 20px auto;
+      }
+      
+      .login-left {
+        padding: 1.5rem;
+      }
+      
+      .login-right {
+        padding: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+        background-attachment: scroll;
+      }
+
+      .login-container {
+        flex-direction: column;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 12px;
+        min-height: auto;
+      }
+
+      .login-left,
+      .login-right {
+        width: 100%;
+        border-radius: 12px;
+      }
+
+      .login-left {
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem;
+        min-height: 200px;
+      }
+
+      .login-right {
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+      }
+
+      .login-left img {
+        max-width: 60%;
+        height: auto;
+      }
+
+      .login-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .login-header p {
+        font-size: 0.8rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group input {
+        padding: 12px 16px 12px 40px;
+        font-size: 16px;
+        min-height: 44px;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        background-color: #ffffff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .form-group input:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        outline: none;
+      }
+
+      .input-container i {
+        left: 12px;
+        font-size: 1rem;
+        color: #6b7280;
+      }
+
+      .login-button {
+        padding: 12px 24px;
+        font-size: 16px;
+        min-height: 44px;
+        border-radius: 8px;
+        width: 100%;
+        touch-action: manipulation;
+      }
+
+      .login-button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+      }
+
+      .signup-text {
+        font-size: 0.85rem;
+        margin-top: 1.5rem;
+      }
+
+      .signup-text a {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        display: inline-block;
+        min-height: 44px;
+        line-height: 28px;
+        touch-action: manipulation;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 5px;
+      }
+
+      .login-container {
+        border-radius: 8px;
+        margin: 0;
+      }
+
+      .login-left {
+        padding: 1rem;
+        min-height: 150px;
+      }
+
+      .login-right {
+        padding: 1rem;
+      }
+
+      .login-left img {
+        max-width: 50%;
+      }
+
+      .login-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .login-header p {
+        font-size: 0.75rem;
+      }
+
+      .form-group input {
+        padding: 10px 14px 10px 36px;
+        font-size: 16px;
+        min-height: 44px;
+      }
+
+      .input-container i {
+        left: 10px;
+        font-size: 0.9rem;
+      }
+
+      .login-button {
+        padding: 10px 20px;
+        font-size: 15px;
+        min-height: 44px;
+      }
+
+      .signup-text {
+        font-size: 0.8rem;
+      }
+
+      .signup-text a {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        min-height: 44px;
+        line-height: 32px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .login-left {
+        padding: 0.8rem;
+        min-height: 120px;
+      }
+
+      .login-right {
+        padding: 0.8rem;
+      }
+
+      .login-header h1 {
+        font-size: 1.3rem;
+      }
+
+      .form-group input {
+        padding: 8px 12px 8px 32px;
+        font-size: 16px;
+      }
+
+      .input-container i {
+        left: 8px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-left">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+      <div>
+        <h2>Welcome to PiyuKonek</h2>
+        <p>Connecting Students, Caring for Minds. Your Voice Matters at PiyuKonek.</p>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <div class="login-header">
+        <h1>Login</h1>
+        <p>Please login to your account</p>
+      </div>
+
+      <!-- ✅ Flash message display -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- ✅ Correct POST form -->
+      <form class="login-form" method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <div class="input-container">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-container">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+        </div>
+        <div style="text-align:right; margin-bottom:10px;">
+          <a href="{{ url_for('forgot_password') }}" style="font-size:0.98em; color:#6b48ff; text-decoration:none;">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-button">Log In</button>
+
+        <div class="signup-text">
+          No Account Yet? <a href="{{ url_for('account_type') }}">Sign Up</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

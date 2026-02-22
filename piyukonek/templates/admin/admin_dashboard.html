@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PiyuKonek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #45a049;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: var(--secondary-color);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard Content */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+        }
+
+        .icon-users {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        }
+
+        .icon-concerns {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        }
+
+        .icon-resolved {
+            background: linear-gradient(135deg, #22c55e, #34d399);
+        }
+
+        .icon-system {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Recent Activity Section */
+        .recent-activity {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .view-all {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .view-all:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .activity-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-new {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Quick Actions Section */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .action-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .action-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Enhanced Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.show {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 70px 15px 20px;
+                width: 100%;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px 0;
+            }
+
+            .user-profile {
+                align-self: flex-end;
+                padding: 8px 12px;
+            }
+
+            .user-profile img,
+            .avatar-fallback {
+                width: 45px;
+                height: 45px;
+            }
+
+            .user-info h3 {
+                font-size: 0.9rem;
+            }
+
+            .user-info p {
+                font-size: 0.8rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-header {
+                margin-bottom: 10px;
+            }
+
+            .stat-title {
+                font-size: 0.9rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .stat-change {
+                font-size: 0.8rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .action-card {
+                padding: 15px;
+            }
+
+            .action-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .action-title {
+                font-size: 0.9rem;
+            }
+
+            .action-description {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 70px 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .action-card {
+                padding: 12px;
+            }
+
+            .action-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .user-profile {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .user-info h3 {
+                font-size: 0.85rem;
+            }
+
+            .user-info p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+            <h2>PiyuKonek</h2>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link{% if request.endpoint == 'admin_dashboard' %} active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('user_management') }}" class="nav-link{% if request.endpoint == 'user_management' %} active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_user_approval') }}" class="nav-link{% if request.endpoint == 'admin_user_approval' %} active{% endif %}">
+                    <i class="fas fa-user-check"></i>
+                    <span>User Approval</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_concern') }}" class="nav-link{% if request.endpoint == 'admin_concern' %} active{% endif %}">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Concerns</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_departments') }}" class="nav-link{% if request.endpoint == 'admin_departments' %} active{% endif %}">
+                    <i class="fas fa-building"></i>
+                    <span>Departments</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_courses') }}" class="nav-link{% if request.endpoint == 'admin_courses' %} active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Courses</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_notification') }}" class="nav-link{% if request.endpoint == 'admin_notification' %} active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_activities') }}" class="nav-link{% if request.endpoint == 'admin_activities' %} active{% endif %}">
+                    <i class="fas fa-list"></i>
+                    <span>Activities</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_concern_types') }}" class="nav-link{% if request.endpoint == 'admin_concern_types' %} active{% endif %}">
+                    <i class="fas fa-tags"></i>
+                    <span>Concern Types</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a href="{{ url_for('admin_analytics') }}" class="nav-link{% if request.endpoint == 'admin_analytics' %} active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="confirmLogout(event)">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-home"></i>Dashboard</h1>
+            <div class="user-profile">
+                {% if admin and admin.profile_image %}
+                    <img src="{{ url_for('uploaded_file', filename=admin.profile_image) }}" alt="Profile Picture" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid white;box-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                {% else %}
+                    <span style="width:60px;height:60px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e8f5e9;color:#4CAF50;border:2px solid white;box-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                        <i class="fas fa-user" style="font-size:28px;"></i>
+                    </span>
+                {% endif %}
+                <div class="user-info">
+                    <h3>{{ admin.fullname if admin else 'Admin User' }}</h3>
+                    <p>{{ admin.email_address if admin else 'Administrator' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Total Users</h3>
+                    <div class="stat-icon icon-users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% from last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Active Concerns</h3>
+                    <div class="stat-icon icon-concerns">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ active_concerns }}</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>5% from last week</span>
+                </div>
+            </div>
+
+            <!-- New Stat Card for Resolved Concerns -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Resolved Concerns</h3>
+                    <div class="stat-icon icon-resolved">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ resolved_concerns }}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8% from last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="recent-activity">
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+                <a href="{{ url_for('admin_activities') }}" class="view-all">View All</a>
+            </div>
+            <div class="activity-list">
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                    <div class="activity-icon icon-{{ 'users' if activity.type in ['student','ssc'] else 'concerns' }}">
+                        {% if activity.type == 'student' %}
+                        <i class="fas fa-user-plus"></i>
+                        {% elif activity.type == 'ssc' %}
+                        <i class="fas fa-user-tie"></i>
+                        {% elif activity.type == 'concern' %}
+                        <i class="fas fa-exclamation-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">{{ activity.title }}</div>
+                        <div class="activity-time">{{ activity.time.strftime('%Y-%m-%d %H:%M') if activity.time else '' }}</div>
+                        {% if activity.type == 'concern' and activity.resolution_notes %}
+                        <div style="background:#e6f9ed;border:2px solid #4CAF50;border-radius:10px;padding:12px 16px;margin-top:10px;display:flex;align-items:center;gap:10px;">
+                            <i class="fas fa-comment-dots" style="color:#22c55e;font-size:1.2em;"></i>
+                            <span style="color:#15803d;font-weight:500;">Guidance Response:</span>
+                            <span style="color:#222;font-size:1em;">{{ activity.resolution_notes }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if activity.type == 'concern' %}
+                    <span class="activity-status status-{{ 'new' if activity.status == 'pending' else 'pending' }}">{{ activity.status|capitalize }}</span>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div>No recent activity found.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="quick-actions">
+            <a href="{{ url_for('user_management') }}" class="action-card">
+                <div class="action-icon icon-users">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h3 class="action-title">Manage Users</h3>
+                <p class="action-description">Add, edit, or remove user accounts</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event listeners for action cards
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Add your action logic here
+                    console.log('Action card clicked:', this.querySelector('.action-title').textContent);
+                });
+            });
+
+            // Add click event listener for user profile
+            const userProfile = document.querySelector('.user-profile');
+            userProfile.addEventListener('click', function() {
+                // Add your profile action logic here
+                console.log('User profile clicked');
+            });
+        });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        }
+
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('show');
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('show');
+        }
+
+        // Close mobile menu when clicking on nav links
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    closeMobileMenu();
+                });
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+        });
+    </script>
+</body>
+</html>

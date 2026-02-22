@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Guidance Staff - Concerns Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #45a049;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: url("{{ url_for('static', filename='images/lspu.jfif') }}") no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            color: #8BC34A;
+        }
+
+        .nav-link.active i {
+            color: #ffffff;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            background: var(--secondary-color);
+            /* Let the content use the full remaining width (table has many columns) */
+            max-width: none;
+            margin-right: 0;
+            min-height: 100vh;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden; /* prevent page-level horizontal overflow */
+            box-sizing: border-box;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .top-bar h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Date & Time display */
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .datetime-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 10px;
+        }
+
+        .date-text, .time-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .date-text::before {
+            content: "\f073"; /* calendar icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 6px;
+            color: var(--primary-color);
+        }
+
+        .time-text::before {
+            content: "\f017"; /* clock icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 6px;
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .user-profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Concerns Management Styles */
+        .concerns-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 25px;
+        }
+
+        .concerns-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .concerns-header h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .search-filter-container form {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Make inline controls align flush without extra spacing */
+        .search-filter-container .form-group {
+            margin: 0;
+            padding: 0;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-left: 45px;
+            padding-right: 80px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .search-box input:focus::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+            z-index: 1;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .search-box input:focus ~ .search-icon {
+            color: var(--primary-color);
+        }
+
+        .search-actions {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+        }
+
+        .search-btn, .clear-search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+        }
+
+        .clear-search-btn {
+            background: var(--text-secondary);
+            padding: 8px 10px;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .clear-search-btn:hover {
+            background: #64748b;
+            transform: translateY(-1px);
+        }
+
+        .search-btn:disabled, .clear-search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Visually hidden (accessible) */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Department select alignment to search input */
+        .dept-select {
+            height: 46px;
+            padding: 0 16px;
+            display: inline-block;
+            border-radius: 12px;
+            box-sizing: border-box;
+            background: #ffffff;
+            color: #000000;
+        }
+        /* Keep department select white even if it receives .active by mistake */
+        .dept-select.active {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        /* Ensure native dropdown list uses white background and black text */
+        select.filter-btn,
+        select.filter-btn option {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .filter-btn {
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .clear-filters-btn {
+            background: #f3f4f6 !important;
+            color: #6b7280 !important;
+            border-color: #d1d5db !important;
+        }
+
+        .clear-filters-btn:hover {
+            background: #e5e7eb !important;
+            color: #374151 !important;
+            transform: translateY(-1px);
+        }
+
+        .concerns-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+            min-width: 900px;
+        }
+        
+        .concerns-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -1px;
+        }
+        .concerns-container { overflow-x: visible; }
+        .concerns-table th {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .concerns-table td {
+            white-space: nowrap;
+        }
+        .concerns-table td:nth-child(3) { min-width: 120px; white-space: normal; word-break: normal; }
+        .concerns-table td:nth-child(4) { min-width: 100px; white-space: normal; word-break: normal; }
+        .concerns-table td:nth-child(5) { min-width: 80px; white-space: normal; word-break: normal; }
+        .concerns-table td:nth-child(10) { white-space: nowrap; min-width: 160px; }
+        
+        /* Make action buttons wrap instead of widening the table */
+        .action-buttons {
+            flex-wrap: wrap;
+            row-gap: 6px;
+        }
+        
+        /* Column sizing hints (keeps table compact) */
+        .concerns-table th:nth-child(1),
+        .concerns-table td:nth-child(1) { width: 50px; }
+        .concerns-table th:nth-child(2),
+        .concerns-table td:nth-child(2) { width: 70px; }
+        .concerns-table th:nth-child(5),
+        .concerns-table td:nth-child(5) { width: 110px; }
+        .concerns-table th:nth-child(6),
+        .concerns-table td:nth-child(6) { width: 95px; }
+        .concerns-table th:nth-child(7),
+        .concerns-table td:nth-child(7) { width: 120px; }
+        .concerns-table th:nth-child(8),
+        .concerns-table td:nth-child(8) { width: 120px; }
+        .concerns-table th:nth-child(9),
+        .concerns-table td:nth-child(9) { width: 110px; }
+        .concerns-table th:nth-child(10),
+        .concerns-table td:nth-child(10) { width: 190px; }
+        
+        @media (max-width: 1200px) {
+            .concerns-table th, .concerns-table td { padding: 12px 10px; font-size: 0.9rem; }
+        }
+        @media (max-width: 900px) {
+            .concerns-table th, .concerns-table td { padding: 10px 8px; font-size: 0.85rem; }
+        }
+
+        .concerns-table th {
+            text-align: left;
+            padding: 15px;
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .concerns-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .concerns-table tr:hover {
+            background: var(--secondary-color);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .priority-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 500; display: inline-block; }
+        .priority-low { background: #e0f2fe; color: #0369a1; }
+        .priority-medium { background: #fef3c7; color: #b45309; }
+        .priority-high { background: #fed7aa; color: #c2410c; }
+        .priority-urgent { background: #fecaca; color: #b91c1c; }
+        .priority-none { background: #f1f5f9; color: #64748b; }
+
+        .sort-by-priority { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        .sort-by-priority .sort-label { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; margin-right: 4px; }
+        .sort-by-priority a { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: #fff; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: all 0.2s ease; }
+        .sort-by-priority a:hover { background: rgba(76, 175, 80, 0.1); color: var(--primary-color); border-color: var(--primary-color); }
+        .sort-by-priority a.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        /* Deadline Styles */
+        .deadline-cell {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .deadline-overdue {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .deadline-today {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+
+        .deadline-warning {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+
+        .deadline-normal {
+            background: #f0f9ff;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .deadline-missing {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .action-buttons {
+            /* Compact, aligned actions without widening table */
+            display: grid;
+            grid-template-columns: 1fr 44px; /* View + square PDF button */
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            min-height: 36px;
+        }
+
+        .view-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .resolve-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .resolve-btn:hover {
+            background: #16a34a;
+        }
+
+        .pdf-btn {
+            width: 44px;
+            height: 36px;
+            padding: 0;
+            background: #e53935;
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Make Resolve take full width on its own row */
+        .action-buttons form {
+            grid-column: 1 / -1;
+            margin: 0;
+        }
+        .action-buttons form .resolve-btn {
+            width: 100%;
+        }
+
+        .resolved-label {
+            grid-column: 1 / -1;
+            width: 100%;
+            background: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .statistics-container {
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1 1 160px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px 8px 8px 16px;
+            box-shadow: var(--shadow-sm);
+            margin-right: 20px;
+            margin-bottom: 10px;
+            border-left: 6px solid transparent;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+        .stat-card:last-child {
+            margin-right: 0;
+        }
+        .stat-card.pending {
+            border-left: 6px solid #f59e0b;
+        }
+        .stat-card.processing {
+            border-left: 6px solid #3b82f6;
+        }
+        .stat-card.resolved {
+            border-left: 6px solid #22c55e;
+        }
+        .stat-card.overdue {
+            border-left: 6px solid #dc2626;
+        }
+        .stat-card.total {
+            border-left: 6px solid var(--primary-color);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .mobile-menu-toggle:hover { background: var(--primary-dark); }
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-overlay.show { display: block; }
+        @media (max-width: 1024px) {
+            .mobile-menu-toggle { display: block; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; padding: 70px 15px 20px; }
+            .statistics-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card {
+                margin-right: 0;
+                margin-bottom: 0;
+                min-width: 0;
+            }
+            .top-bar { flex-wrap: wrap; gap: 15px; }
+        }
+        .overdue-warning-banner > div {
+            flex-wrap: wrap;
+        }
+        @media (max-width: 900px) {
+            .concerns-table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-left: -15px;
+                margin-right: -15px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .concerns-table { min-width: 850px; }
+        }
+        /* Bulk Actions Styles */
+        .bulk-actions-bar {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .bulk-actions-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .selected-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .bulk-action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bulk-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bulk-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bulk-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* Checkbox Styles */
+        .concern-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        #select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .main-content { padding: 70px 10px 15px; }
+            .statistics-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .stat-card { padding: 15px; margin-bottom: 0; }
+            
+            .search-filter-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-filter-container form {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-box {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .filter-options {
+                justify-content: center;
+                width: 100%;
+            }
+            .overdue-warning-banner > div {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .overdue-warning-banner button {
+                margin-left: 0 !important;
+            }
+            .bulk-actions-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .bulk-action-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+                <h2>PiyuKonek</h2>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_dashboard') }}" class="nav-link{% if request.endpoint == 'ssc_dashboard' %} active{% endif %}">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_concerns') }}" class="nav-link{% if request.endpoint == 'ssc_concerns' %} active{% endif %}">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Concerns</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_students') }}" class="nav-link{% if request.endpoint == 'ssc_students' %} active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_notifications') }}" class="nav-link{% if request.endpoint == 'ssc_notifications' %} active{% endif %}">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_concern_types') }}" class="nav-link{% if request.endpoint == 'ssc_concern_types' %} active{% endif %}">
+                        <i class="fas fa-tags"></i>
+                        <span>Concern Types</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_profile') }}" class="nav-link{% if request.endpoint == 'ssc_profile' %} active{% endif %}">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                </div>
+                        <div class="nav-item">
+          <a href="{{ url_for('ssc_message') }}" class="nav-link{% if request.endpoint == 'ssc_message' %} active{% endif %}">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Messages</span>
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="{{ url_for('ssc_analytics') }}" class="nav-link{% if request.endpoint == 'ssc_analytics' %} active{% endif %}">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" onclick="confirmLogout(event)">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-left">
+                    <h2>Concerns Management</h2>
+                    <div class="datetime-display">
+                        <span id="current-date" class="date-text"></span>
+                        <span id="current-time" class="time-text"></span>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    {% if ssc.profile_image %}
+                        <img src="{{ url_for('uploaded_file', filename=ssc.profile_image) }}" alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                    {% else %}
+                        <span style="width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background:#e8f5e9; color:#4CAF50; border: 2px solid white; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                            <i class="fas fa-user" style="font-size:28px;"></i>
+                        </span>
+                    {% endif %}
+                    <div class="user-info">
+                        <h3>{{ ssc.fullname }}</h3>
+                        <p>{{ ssc.position.replace('-', ' ').replace('_', ' ').title() }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concerns Container -->
+            <div class="concerns-container">
+                <div class="concerns-header">
+                    <h3>All Concerns</h3>
+                </div>
+
+                <!-- Overdue Warning Banner -->
+                <div id="overdue-warning-banner" class="overdue-warning-banner" style="display: none; background: linear-gradient(135deg, #dc2626, #ef4444); color: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.1rem; font-weight: 600;">Overdue Concerns Detected</h4>
+                            <p style="margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.9;">
+                                <span id="overdue-warning-text">Some concerns have passed their 3-day resolution deadline and require immediate attention.</span>
+                            </p>
+                        </div>
+                        <button onclick="filterOverdueConcerns()" style="margin-left: auto; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease;">
+                            <i class="fas fa-filter"></i> View Overdue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="statistics-container" style="display: flex; gap: 20px; margin-bottom: 25px;">
+                    <div class="stat-card pending">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h4 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;">Pending</h4>
+                                <p style="font-size: 1.8rem; font-weight: 600; color: #92400e; margin: 0;">{{ concerns|selectattr('status', 'equalto', 'pending')|list|length }}</p>
+                            </div>
+                            <i class="fas fa-clock" style="font-size: 1.5rem; color: #f59e0b;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card processing">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h4 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;">Processing</h4>
+                                <p style="font-size: 1.8rem; font-weight: 600; color: #1e40af; margin: 0;">{{ concerns|selectattr('status', 'equalto', 'processing')|list|length }}</p>
+                            </div>
+                            <i class="fas fa-cogs" style="font-size: 1.5rem; color: #3b82f6;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card resolved">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h4 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;">Resolved</h4>
+                                <p style="font-size: 1.8rem; font-weight: 600; color: #166534; margin: 0;">{{ concerns|selectattr('status', 'equalto', 'resolved')|list|length }}</p>
+                            </div>
+                            <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #22c55e;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card overdue">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h4 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;">Overdue</h4>
+                                <p style="font-size: 1.8rem; font-weight: 600; color: #dc2626; margin: 0;" id="overdue-count">0</p>
+                            </div>
+                            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: #dc2626;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card total">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <h4 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;">Total</h4>
+                                <p style="font-size: 1.8rem; font-weight: 600; color: var(--primary-color); margin: 0;">{{ concerns|length }}</p>
+                            </div>
+                            <i class="fas fa-list" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="search-filter-container">
+                    <form method="GET" action="{{ url_for('ssc_concerns') }}" id="search-form">
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="search" placeholder="Search concerns..." value="{{ search }}">
+                            <div class="search-actions">
+                                <button type="button" class="search-btn" title="Search">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                {% if search %}
+                                <button type="button" class="clear-search-btn" title="Clear search">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Filter By Department -->
+                        <div class="form-group" style="min-width: 220px; display:flex; flex-direction: row; align-items: center;">
+                            <label for="filter-department" class="sr-only">Department</label>
+                            <select id="filter-department" class="filter-btn dept-select" style="width: 100%;">
+                                <option value="">All</option>
+                                <option value="CCS">CCS</option>
+                                <option value="COE">COE</option>
+                                <option value="CTE">CTE</option>
+                                <option value="CAS">CAS</option>
+                                <option value="CBAA">CBAA</option>
+                                <option value="CONAH">CONAH</option>
+                                <option value="CIHMT">CIHMT</option>
+                                <option value="CIT">CIT</option>
+                                <option value="CCJE">CCJE</option>
+                            </select>
+                        </div>
+                        <div class="filter-options">
+                            <button type="submit" name="status" value="" class="filter-btn {{ 'active' if not status_filter or status_filter.lower() == 'all' else '' }}">All</button>
+                            <button type="submit" name="status" value="pending" class="filter-btn {{ 'active' if status_filter.lower() == 'pending' else '' }}">Pending</button>
+                            <button type="submit" name="status" value="processing" class="filter-btn {{ 'active' if status_filter.lower() == 'processing' else '' }}">Processing</button>
+                            <button type="submit" name="status" value="resolved" class="filter-btn {{ 'active' if status_filter.lower() == 'resolved' else '' }}">Resolved</button>
+                            <button type="submit" name="status" value="overdue" class="filter-btn {{ 'active' if status_filter.lower() == 'overdue' else '' }}">
+                                <i class="fas fa-exclamation-triangle"></i> Overdue
+                            </button>
+                            {% if search or status_filter or priority_filter %}
+                            <button type="button" class="filter-btn clear-filters-btn" onclick="clearAllFilters()">
+                                <i class="fas fa-times"></i> Clear All
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="sort-by-priority" style="flex: 1 1 100%;">
+                            <span class="sort-label"><i class="fas fa-sort-amount-down"></i> Sort by priority:</span>
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter) }}" class="{{ 'active' if not priority_filter else '' }}">All</a>
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter, priority='low') }}" class="{{ 'active' if priority_filter == 'low' else '' }}">Low ({{ count_low }})</a>
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter, priority='medium') }}" class="{{ 'active' if priority_filter == 'medium' else '' }}">Medium ({{ count_medium }})</a>
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter, priority='high') }}" class="{{ 'active' if priority_filter == 'high' else '' }}">High ({{ count_high }})</a>
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter, priority='urgent') }}" class="{{ 'active' if priority_filter == 'urgent' else '' }}">Urgent ({{ count_urgent }})</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Filter Status Indicator -->
+                <div class="filter-status" style="margin-bottom: 15px; padding: 10px 15px; background: rgba(76, 175, 80, 0.1); border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">
+                        <i class="fas fa-filter"></i>
+                        {% if search and status_filter and status_filter.lower() != 'all' and priority_filter %}
+                            Showing {{ concerns|length }} {{ priority_filter|title }} {{ status_filter|title }} concern{{ 's' if concerns|length != 1 else '' }} matching "<strong>{{ search }}</strong>"
+                        {% elif search and priority_filter %}
+                            Showing {{ concerns|length }} {{ priority_filter|title }} concern{{ 's' if concerns|length != 1 else '' }} matching "<strong>{{ search }}</strong>"
+                        {% elif status_filter and status_filter.lower() != 'all' and priority_filter %}
+                            Showing {{ concerns|length }} {{ priority_filter|title }} {{ status_filter|title }} concern{{ 's' if concerns|length != 1 else '' }}
+                        {% elif priority_filter %}
+                            Showing {{ concerns|length }} {{ priority_filter|title }} concern{{ 's' if concerns|length != 1 else '' }}
+                        {% elif search and status_filter and status_filter.lower() != 'all' %}
+                            Showing {{ concerns|length }} {{ status_filter|title }} concern{{ 's' if concerns|length != 1 else '' }} matching "<strong>{{ search }}</strong>"
+                        {% elif search %}
+                            Showing {{ concerns|length }} concern{{ 's' if concerns|length != 1 else '' }} matching "<strong>{{ search }}</strong>"
+                        {% elif status_filter and status_filter.lower() != 'all' %}
+                            Showing {{ concerns|length }} {{ status_filter|title }} concern{{ 's' if concerns|length != 1 else '' }}
+                        {% else %}
+                            Showing all {{ concerns|length }} concern{{ 's' if concerns|length != 1 else '' }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Bulk Actions Bar -->
+                <div id="bulk-actions-bar" class="bulk-actions-bar" style="display: none;">
+                    <div class="bulk-actions-content">
+                        <span class="selected-count">
+                            <i class="fas fa-check-square"></i>
+                            <span id="selected-count">0</span> concern(s) selected
+                        </span>
+                        <div class="bulk-action-buttons">
+                            <button type="button" class="bulk-btn bulk-status-btn" onclick="showBulkStatusModal()">
+                                <i class="fas fa-edit"></i> Update Status
+                            </button>
+                            {% set _pos = (ssc.position or '') %}
+                            {% set pos_norm = ' '.join(_pos.replace('_',' ').replace('-',' ').lower().split()) %}
+                            {% set can_assign = 'guidance coordinator' in pos_norm or 'guidance supervisor' in pos_norm %}
+                            <button type="button" class="bulk-btn bulk-assign-btn" onclick="showBulkAssignModal()" {% if not can_assign %}disabled title="Only Guidance Coordinator/Supervisor can assign" style="opacity:0.6; cursor:not-allowed;"{% endif %}>
+                                <i class="fas fa-user-plus"></i> Assign Staff
+                            </button>
+                            <button type="button" class="bulk-btn bulk-export-btn" onclick="showBulkExportModal()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button type="button" class="bulk-btn bulk-delete-btn" onclick="showBulkDeleteModal()">
+                                <i class="fas fa-trash"></i> Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Concerns Table -->
+                <div class="concerns-table-wrapper">
+                <table class="concerns-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="select-all-checkbox" onchange="toggleAllConcerns(this)">
+                            </th>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Student</th>
+                            <th>Department</th>
+                            <th>Priority</th>
+                            <th>Date Submitted</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for concern in concerns %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="concern-checkbox" value="{{ concern.id }}" onchange="updateBulkActions()">
+                            </td>
+                            <td>#{{ concern.id }}</td>
+                            <td>{{ concern.title }}</td>
+                            <td>{{ concern.student.fullname }}</td>
+                            <td class="dept-cell">{{ concern.student.college_dept if concern.student and concern.student.college_dept else '—' }}</td>
+                            <td><span class="priority-badge priority-{{ (concern.priority_level or 'none')|lower }}">{{ (concern.priority_level or '—')|title }}</span></td>
+                            <td>{{ concern.submitted_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if concern.deadline %}
+                                    <span class="deadline-cell" data-deadline="{{ concern.deadline.isoformat() }}">
+                                        {{ concern.deadline.strftime('%Y-%m-%d') }}
+                                    </span>
+                                {% else %}
+                                    <span class="deadline-missing" title="Deadline not set">—</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="status-badge status-{{ concern.status }}">{{ concern.status|title }}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('ssc_concern_detail', concern_id=concern.id) }}" class="action-btn view-btn">View</a>
+                                    <a href="{{ url_for('export_concern_pdf', concern_id=concern.id) }}" class="action-btn pdf-btn" title="Export as PDF"><i class="fas fa-file-pdf"></i></a>
+                                    {% if concern.status != 'resolved' %}
+                                    <form method="POST" action="{{ url_for('ssc_resolve_concern', concern_id=concern.id) }}" style="display: inline;">
+                                        <button type="submit" class="action-btn resolve-btn" onclick="return confirm('Are you sure you want to mark this concern as resolved?')">Resolve</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="action-btn resolved-label">Resolved</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                                <div style="margin-bottom: 15px;">
+                                    <i class="fas fa-search" style="font-size: 2rem; color: #cbd5e1;"></i>
+                                </div>
+                                {% if search %}
+                                    <h4 style="margin-bottom: 10px; color: var(--text-primary);">No concerns found</h4>
+                                    <p>No concerns match your search for "<strong>{{ search }}</strong>"</p>
+                                    <button type="button" class="btn btn-secondary" onclick="clearAllFilters()" style="margin-top: 15px;">
+                                        <i class="fas fa-times"></i> Clear Search
+                                    </button>
+                                {% else %}
+                                    <h4 style="margin-bottom: 10px; color: var(--text-primary);">No concerns available</h4>
+                                    <p>There are no concerns to display at the moment.</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if pagination and pagination.pages > 1 %}
+                <div class="pagination-wrapper" style="margin-top: 20px; padding: 16px 0; border-top: 1px solid var(--border-color); display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <a href="{% if pagination.has_prev %}{{ url_for('ssc_concerns', search=search, status=status_filter, priority=priority_filter, page=pagination.prev_num) }}{% else %}#{% endif %}" class="page-btn" style="padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; background: var(--secondary-color); color: var(--text-secondary); border: 1px solid var(--border-color); {% if not pagination.has_prev %}pointer-events: none; opacity: 0.6;{% endif %}"><i class="fas fa-chevron-left"></i> Previous</a>
+                    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if p %}
+                            {% if p == pagination.page %}
+                            <span class="page-btn active" style="padding: 8px 14px; border-radius: 8px; font-weight: 700; background: var(--primary-color); color: white;">{{ p }}</span>
+                            {% else %}
+                            <a href="{{ url_for('ssc_concerns', search=search, status=status_filter, priority=priority_filter, page=p) }}" class="page-btn" style="padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; background: var(--secondary-color); color: var(--text-primary); border: 1px solid var(--border-color);">{{ p }}</a>
+                            {% endif %}
+                        {% else %}
+                            <span style="padding: 0 6px; color: var(--text-secondary);">…</span>
+                        {% endif %}
+                    {% endfor %}
+                    <a href="{% if pagination.has_next %}{{ url_for('ssc_concerns', search=search, status=status_filter, priority=priority_filter, page=pagination.next_num) }}{% else %}#{% endif %}" class="page-btn" style="padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; background: var(--secondary-color); color: var(--text-secondary); border: 1px solid var(--border-color); {% if not pagination.has_next %}pointer-events: none; opacity: 0.6;{% endif %}">Next <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <p style="text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin-top: 8px;">Page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} concern{{ 's' if pagination.total != 1 else '' }})</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Status Update Modal -->
+    <div id="bulk-status-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Bulk Status Update</h3>
+                <button class="close-modal" onclick="closeModal('bulk-status-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-status">New Status:</label>
+                    <select id="new-status" required>
+                        <option value="">Select Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="action-notes">Notes (Optional):</label>
+                    <textarea id="action-notes" rows="3" placeholder="Add any notes about this status change..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('bulk-status-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="executeBulkStatusUpdate()">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Assignment Modal -->
+    <div id="bulk-assign-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Bulk Staff Assignment</h3>
+                <button class="close-modal" onclick="closeModal('bulk-assign-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="assigned-staff">Assign to Staff Member:</label>
+                    <select id="assigned-staff" required>
+                        <option value="">Select Staff Member</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Selected concerns will be assigned to the chosen staff member and marked as "Processing".
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('bulk-assign-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="executeBulkAssignment()">Assign Concerns</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Export Modal -->
+    <div id="bulk-export-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-download"></i> Bulk Export</h3>
+                <button class="close-modal" onclick="closeModal('bulk-export-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="export-format">Export Format:</label>
+                    <select id="export-format">
+                        <option value="csv">CSV (Excel)</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Export selected concerns with all relevant information.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('bulk-export-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="executeBulkExport()">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Modal -->
+    <div id="bulk-delete-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash"></i> Bulk Close Concerns</h3>
+                <button class="close-modal" onclick="closeModal('bulk-delete-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="delete-reason">Reason for Closing:</label>
+                    <textarea id="delete-reason" rows="3" placeholder="Please provide a reason for closing these concerns..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; color: #92400e;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> This action will close the selected concerns. They will be marked as "Closed" and cannot be reopened.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('bulk-delete-modal')">Cancel</button>
+                <button class="btn btn-danger" onclick="executeBulkDelete()">Close Concerns</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.querySelector('input[name="search"]');
+        const searchForm = document.getElementById('search-form');
+        const searchBtn = document.querySelector('.search-btn');
+        const clearSearchBtn = document.querySelector('.clear-search-btn');
+        
+        // Search on Enter key press
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+
+        // Search on search button click
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                performSearch();
+            });
+        }
+
+        // Clear search functionality
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                // Remove search parameter from URL and reload
+                const url = new URL(window.location);
+                url.searchParams.delete('search');
+                window.location.href = url.toString();
+            });
+        }
+
+        // Perform search function
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm === '') {
+                // If search is empty, just reload without search parameter
+                const url = new URL(window.location);
+                url.searchParams.delete('search');
+                window.location.href = url.toString();
+                return;
+            }
+            
+            // Show loading state
+            if (searchBtn) {
+                searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                searchBtn.disabled = true;
+            }
+            
+            // Submit the form
+            searchForm.submit();
+        }
+
+        // Update search button state based on input
+        searchInput.addEventListener('input', function() {
+            const hasValue = this.value.trim() !== '';
+            if (searchBtn) {
+                searchBtn.disabled = !hasValue;
+            }
+        });
+
+        // Initialize search button state
+        if (searchBtn) {
+            searchBtn.disabled = searchInput.value.trim() === '';
+        }
+
+        // Filter button functionality (buttons only)
+        document.querySelectorAll('button.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all filter buttons
+                document.querySelectorAll('button.filter-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+            });
+        });
+
+        // Add click event listeners for action buttons
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Add your action handling logic here
+                console.log('Action button clicked:', button.textContent);
+            });
+        });
+
+        // Add click event listeners for pagination buttons
+        document.querySelectorAll('.page-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                if (!button.classList.contains('active')) {
+                    document.querySelectorAll('.page-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                }
+            });
+        });
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar').classList.toggle('mobile-open');
+            document.querySelector('.mobile-overlay').classList.toggle('show');
+        }
+        function closeMobileMenu() {
+            document.querySelector('.sidebar').classList.remove('mobile-open');
+            document.querySelector('.mobile-overlay').classList.remove('show');
+        }
+        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', closeMobileMenu));
+        window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeMobileMenu(); });
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        }
+
+        // Bulk Operations JavaScript Functions
+        let selectedConcerns = [];
+
+        function updateBulkActions() {
+            const checkboxes = document.querySelectorAll('.concern-checkbox:checked');
+            selectedConcerns = Array.from(checkboxes).map(cb => cb.value);
+            
+            const bulkBar = document.getElementById('bulk-actions-bar');
+            const selectedCount = document.getElementById('selected-count');
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            
+            if (selectedConcerns.length > 0) {
+                bulkBar.style.display = 'block';
+                selectedCount.textContent = selectedConcerns.length;
+                
+                // Update select all checkbox state
+                const totalCheckboxes = document.querySelectorAll('.concern-checkbox');
+                selectAllCheckbox.checked = selectedConcerns.length === totalCheckboxes.length;
+                selectAllCheckbox.indeterminate = selectedConcerns.length > 0 && selectedConcerns.length < totalCheckboxes.length;
+            } else {
+                bulkBar.style.display = 'none';
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+        }
+
+        function toggleAllConcerns(checkbox) {
+            const concernCheckboxes = document.querySelectorAll('.concern-checkbox');
+            concernCheckboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateBulkActions();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showBulkStatusModal() {
+            if (selectedConcerns.length === 0) {
+                alert('Please select concerns first.');
+                return;
+            }
+            document.getElementById('bulk-status-modal').style.display = 'flex';
+        }
+
+        function showBulkAssignModal() {
+            if (selectedConcerns.length === 0) {
+                alert('Please select concerns first.');
+                return;
+            }
+            loadStaffList();
+            document.getElementById('bulk-assign-modal').style.display = 'flex';
+        }
+
+        function showBulkExportModal() {
+            if (selectedConcerns.length === 0) {
+                alert('Please select concerns first.');
+                return;
+            }
+            document.getElementById('bulk-export-modal').style.display = 'flex';
+        }
+
+        function showBulkDeleteModal() {
+            if (selectedConcerns.length === 0) {
+                alert('Please select concerns first.');
+                return;
+            }
+            document.getElementById('bulk-delete-modal').style.display = 'flex';
+        }
+
+        function loadStaffList() {
+            fetch('/ssc/get_staff_list')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('assigned-staff');
+                        select.innerHTML = '<option value="">Select Staff Member</option>';
+                        data.staff.forEach(staff => {
+                            const option = document.createElement('option');
+                            option.value = staff.id;
+                            option.textContent = `${staff.name} (${staff.position.replace('-', ' ').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})`;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading staff list:', error);
+                });
+        }
+
+        function executeBulkStatusUpdate() {
+            const newStatus = document.getElementById('new-status').value;
+            const actionNotes = document.getElementById('action-notes').value;
+            
+            if (!newStatus) {
+                alert('Please select a status.');
+                return;
+            }
+            
+            const formData = new FormData();
+            selectedConcerns.forEach(id => formData.append('concern_ids[]', id));
+            formData.append('new_status', newStatus);
+            formData.append('action_notes', actionNotes);
+            
+            fetch('/ssc/bulk_update_status', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeModal('bulk-status-modal');
+                    location.reload(); // Refresh to show updated statuses
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function executeBulkAssignment() {
+            const assignedStaff = document.getElementById('assigned-staff').value;
+            
+            if (!assignedStaff) {
+                alert('Please select a staff member.');
+                return;
+            }
+            
+            const formData = new FormData();
+            selectedConcerns.forEach(id => formData.append('concern_ids[]', id));
+            formData.append('assigned_to', assignedStaff);
+            
+            fetch('/ssc/bulk_assign', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeModal('bulk-assign-modal');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function executeBulkExport() {
+            const exportFormat = document.getElementById('export-format').value;
+            
+            const formData = new FormData();
+            selectedConcerns.forEach(id => formData.append('concern_ids[]', id));
+            formData.append('export_format', exportFormat);
+            
+            fetch('/ssc/bulk_export', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Export failed');
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bulk_concerns_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.${exportFormat}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                closeModal('bulk-export-modal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Export failed. Please try again.');
+            });
+        }
+
+        function executeBulkDelete() {
+            const deleteReason = document.getElementById('delete-reason').value;
+            
+            if (!deleteReason.trim()) {
+                alert('Please provide a reason for closing the concerns.');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to close ${selectedConcerns.length} concern(s)? This action cannot be undone.`)) {
+                return;
+            }
+            
+            const formData = new FormData();
+            selectedConcerns.forEach(id => formData.append('concern_ids[]', id));
+            formData.append('delete_reason', deleteReason);
+            
+            fetch('/ssc/bulk_delete', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeModal('bulk-delete-modal');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        // Clear all filters function
+        function clearAllFilters() {
+            const url = new URL(window.location);
+            url.searchParams.delete('search');
+            url.searchParams.delete('status');
+            url.searchParams.delete('priority');
+            window.location.href = url.toString();
+        }
+
+        // Date & Time updater (mm/dd/yyyy, hh:mm:ss AM/PM)
+        function updateDateTime() {
+            const now = new Date();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const dateEl = document.getElementById('current-date');
+            const timeEl = document.getElementById('current-time');
+            if (dateEl) {
+                dateEl.textContent = `${mm}/${dd}/${yyyy}`;
+            }
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours === 0 ? 12 : hours;
+            const hh = String(hours).padStart(2, '0');
+            if (timeEl) {
+                timeEl.textContent = `${hh}:${minutes}:${seconds} ${ampm}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            updateDeadlineStatuses();
+            
+            // Initialize department filter from URL and bind change handler
+            const params = new URLSearchParams(window.location.search);
+            const deptParam = params.get('department') || '';
+            const deptSelect = document.getElementById('filter-department');
+            if (deptSelect) {
+                deptSelect.value = deptParam;
+                filterByDepartment(deptParam);
+                deptSelect.addEventListener('change', function() {
+                    const selected = this.value || '';
+                    filterByDepartment(selected);
+                    const url = new URL(window.location);
+                    if (selected) {
+                        url.searchParams.set('department', selected);
+                    } else {
+                        url.searchParams.delete('department');
+                    }
+                    window.history.replaceState({}, '', url);
+                });
+            }
+        });
+
+        // Update deadline statuses based on current time
+        function updateDeadlineStatuses() {
+            const deadlineCells = document.querySelectorAll('.deadline-cell');
+            const now = new Date();
+            let overdueCount = 0;
+            
+            deadlineCells.forEach(cell => {
+                const deadlineStr = cell.getAttribute('data-deadline');
+                if (!deadlineStr) return;
+                
+                const deadline = new Date(deadlineStr);
+                const timeDiff = deadline.getTime() - now.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                // Remove existing classes
+                cell.classList.remove('deadline-overdue', 'deadline-today', 'deadline-warning', 'deadline-normal');
+                
+                // Add appropriate class and icon
+                if (daysDiff < 0) {
+                    cell.classList.add('deadline-overdue');
+                    cell.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${cell.textContent.trim()}`;
+                    cell.title = `Overdue by ${Math.abs(daysDiff)} day(s)`;
+                    overdueCount++;
+                } else if (daysDiff === 0) {
+                    cell.classList.add('deadline-today');
+                    cell.innerHTML = `<i class="fas fa-clock"></i> ${cell.textContent.trim()}`;
+                    cell.title = 'Due today';
+                } else if (daysDiff === 1) {
+                    cell.classList.add('deadline-warning');
+                    cell.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${cell.textContent.trim()}`;
+                    cell.title = 'Due tomorrow';
+                } else {
+                    cell.classList.add('deadline-normal');
+                    cell.innerHTML = cell.textContent.trim();
+                    cell.title = `${daysDiff} days remaining`;
+                }
+            });
+            
+            // Update overdue count in statistics
+            const overdueCountElement = document.getElementById('overdue-count');
+            if (overdueCountElement) {
+                overdueCountElement.textContent = overdueCount;
+            }
+            
+            // Show/hide overdue warning banner
+            const warningBanner = document.getElementById('overdue-warning-banner');
+            const warningText = document.getElementById('overdue-warning-text');
+            if (overdueCount > 0) {
+                warningBanner.style.display = 'block';
+                warningText.textContent = `${overdueCount} concern${overdueCount > 1 ? 's have' : ' has'} passed the 3-day resolution deadline and require${overdueCount > 1 ? '' : 's'} immediate attention.`;
+            } else {
+                warningBanner.style.display = 'none';
+            }
+        }
+
+        // Filter to show only overdue concerns
+        function filterOverdueConcerns() {
+            const url = new URL(window.location);
+            url.searchParams.set('status', 'overdue');
+            window.location.href = url.toString();
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
+        });
+        
+        // Client-side filter by Department
+        function filterByDepartment(department) {
+            const tbody = document.querySelector('.concerns-table tbody');
+            if (!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.forEach(row => {
+                const deptCell = row.querySelector('.dept-cell');
+                if (!deptCell) return; // skip empty-state row
+                const cellVal = (deptCell.textContent || '').trim().toUpperCase();
+                const show = !department || cellVal === department.toUpperCase();
+                row.style.display = show ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

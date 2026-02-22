@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Notifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #8BC34A;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #4CAF50;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            /* position: fixed; */
+            /* height: 100vh; */
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            /* margin-left: 280px; */
+            padding: 30px;
+            background: var(--secondary-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow: hidden; /* prevent child overflow from overlapping */
+        }
+
+        .content-wrapper {
+            /* max-width: 1400px; */
+            /* margin: 0 auto; */
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0; /* allow flex children to shrink for scrolling */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .datetime-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-date i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-time i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .user-profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Fallback avatar when no profile image */
+        .avatar-fallback {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .avatar-fallback i { 
+            font-size: 24px; 
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Notifications Styles */
+        .notifications-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            /* enable vertical scroll within the container */
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            flex: 1;
+        }
+
+        .notifications-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .notification-item {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .notification-item:hover {
+            background: var(--secondary-color);
+        }
+
+        .notification-item.unread {
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .icon-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .icon-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .icon-info {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mark-read-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mark-read-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .sidebar-header h2,
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .user-profile {
+                padding: 8px;
+            }
+
+            .user-profile img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .avatar-fallback {
+                width: 35px;
+                height: 35px;
+            }
+            .avatar-fallback i {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+            }
+
+            .notifications-header {
+                padding: 15px 20px;
+            }
+
+            .notification-item {
+                padding: 15px 20px;
+            }
+
+            .filter-options {
+                display: none;
+            }
+        }
+
+        /* Add at the beginning of the style section */
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Badge styles */
+        .badge {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        /* Empty state styles */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Notification type icons */
+        .icon-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .icon-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .icon-info {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Notification actions */
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mark-read-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mark-read-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container page-transition">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/images/logo.png" alt="LSPU Logo">
+                <h2>PiyuKonek</h2>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('concern') }}" class="nav-link">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>My Concerns</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('notifications') }}" class="nav-link active">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                        {% if unread_concerns > 0 %}
+                            <span class="badge" style="margin-left: 8px;">{{ unread_concerns }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                            <div class="nav-item">
+                <a href="{{ url_for('student_reminders') }}" class="nav-link">
+                    <i class="fas fa-clock"></i>
+                    <span>Reminders</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a href="{{ url_for('student_profile') }}" class="nav-link">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+            </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="confirmLogout(event)">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-bell"></i>Notifications</h1>
+                        <div class="datetime-display">
+                            <div class="current-date">
+                                <i class="fas fa-calendar"></i>
+                                <span id="current-date"></span>
+                            </div>
+                            <div class="current-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="current-time"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile">
+                        {% if student.profile_image %}
+                            <img src="{{ url_for('uploaded_file', filename=student.profile_image) }}" alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);" />
+                        {% else %}
+                            <span class="avatar-fallback" title="No profile image">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        {% endif %}
+                        <div class="user-info">
+                            <h3>{{ student.fullname }}</h3>
+                            <p>{{ student.course }} - {{ student.year_lvl }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notifications-container">
+                    <div class="notifications-header">
+                        <h2>Recent Notifications</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="action-btn mark-all-btn" style="background: var(--primary-color); color: white;" title="Mark all as read"><i class="fas fa-check-double"></i> Mark all as read</button>
+                        </div>
+                    </div>
+
+                    <div class="notifications-list" style="flex: 1; min-height: 0; overflow-y: auto; padding-right: 6px;">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                            {% set link = url_for('concern') + ('#concern-' ~ notification.concern_id if notification.concern_id else '') %}
+                            <a href="{{ link }}" style="text-decoration: none; color: inherit;">
+                                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-type="{{ notification.notification_type }}" data-date="{{ notification.created_at.timestamp() }}">
+                                    <div class="notification-icon {% if notification.notification_type in ['concern_update','concern_assigned'] %}icon-success{% elif notification.notification_type == 'system' %}icon-warning{% else %}icon-info{% endif %}">
+                                        {% if notification.notification_type == 'concern_assigned' %}
+                                            <i class="fas fa-user-check"></i>
+                                        {% elif notification.notification_type == 'system' %}
+                                            <i class="fas fa-bullhorn"></i>
+                                        {% else %}
+                                            <i class="fas fa-check-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="notification-content">
+                                        <h3 class="notification-title">{{ notification.title }}</h3>
+                                        <p class="notification-message">{{ notification.message }}</p>
+                                        <div class="notification-meta">
+                                            <div class="notification-time">
+                                                <i class="far fa-clock"></i>
+                                                <span>{{ (notification.created_at|philippines_time).strftime('%B %d, %Y %I:%M %p') if notification.created_at else '—' }}</span>
+                                            </div>
+                                            <div class="notification-actions">
+                                                {% if not notification.is_read %}
+                                                    <button class="action-btn mark-read-btn" data-id="{{ notification.id }}">Mark as Read</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications</h3>
+                            <p>You're all caught up! There are no notifications to display at this time.</p>
+                        </div>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Activate page transition
+            document.querySelector('.page-transition').classList.add('active');
+
+            // Initialize date and time display
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update every second
+
+            // Only 'All' filter remains, so no filter switching needed
+
+            // Mark all as read
+            document.querySelector('.mark-all-btn').addEventListener('click', function() {
+                fetch('/mark_all_notifications_read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'all' })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                        } else {
+                        alert('Error marking all as read');
+                    }
+                });
+            });
+
+            // Sort functionality - prioritize unread notifications at the top
+            const sortButtons = document.querySelectorAll('.filter-btn');
+            const notificationsList = document.querySelector('.notifications-list');
+            const notificationItems = Array.from(document.querySelectorAll('.notification-item'));
+
+            function sortNotifications() {
+                // Sort notifications: unread first, then by date (newest first)
+                const sorted = notificationItems.sort((a, b) => {
+                    const isAUnread = a.classList.contains('unread');
+                    const isBUnread = b.classList.contains('unread');
+                    
+                    // If one is unread and the other is not, unread comes first
+                    if (isAUnread && !isBUnread) return -1;
+                    if (!isAUnread && isBUnread) return 1;
+                    
+                    // If both have the same read status, sort by date (newest first)
+                    const dateA = parseFloat(a.getAttribute('data-date'));
+                    const dateB = parseFloat(b.getAttribute('data-date'));
+                    return dateB - dateA; // Descending order (newest first)
+                });
+                
+                // Re-append sorted items to the container (move parent <a> element)
+                sorted.forEach(item => {
+                    const parentLink = item.closest('a');
+                    if (parentLink) {
+                        notificationsList.appendChild(parentLink);
+                    }
+                });
+            }
+
+            sortButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const sortOrder = button.getAttribute('data-sort');
+                    sortButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    sortNotifications();
+                });
+            });
+
+            // Initial sort: unread first, then newest first
+            sortNotifications();
+
+            // Mark as Read functionality
+            document.querySelectorAll('.mark-read-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const notificationId = this.getAttribute('data-id');
+                    const btn = this;
+                    fetch(`/mark_notification_read/${notificationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(data => data.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update UI
+                            const notificationItem = btn.closest('.notification-item');
+                            notificationItem.classList.remove('unread');
+                            btn.remove();
+                        } else {
+                            alert('Error marking notification as read');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error marking notification as read');
+                    });
+                });
+            });
+        });
+
+        // Online status tracking
+        let activityTimeout;
+        let isOnline = true;
+
+        function updateOnlineStatus() {
+            if (isOnline) {
+                fetch('/update_online_status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).catch(error => console.error('Error updating online status:', error));
+            }
+        }
+
+        function setOffline() {
+            if (isOnline) {
+                isOnline = false;
+                fetch('/set_offline', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).catch(error => console.error('Error setting offline status:', error));
+            }
+        }
+
+        function resetActivityTimeout() {
+            clearTimeout(activityTimeout);
+            activityTimeout = setTimeout(() => {
+                setOffline();
+            }, 300000); // 5 minutes of inactivity
+        }
+
+        // Track user activity
+        function trackActivity() {
+            if (!isOnline) {
+                isOnline = true;
+                updateOnlineStatus();
+            }
+            resetActivityTimeout();
+        }
+
+        // Set up activity tracking
+        document.addEventListener('mousemove', trackActivity);
+        document.addEventListener('keypress', trackActivity);
+        document.addEventListener('click', trackActivity);
+        document.addEventListener('scroll', trackActivity);
+
+        // Set offline when page is unloaded
+        window.addEventListener('beforeunload', setOffline);
+        window.addEventListener('pagehide', setOffline);
+
+        // Initial online status update
+        document.addEventListener('DOMContentLoaded', function() {
+            updateOnlineStatus();
+            resetActivityTimeout();
+        });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = "{{ url_for('logout', tab=current_tab) }}";
+            }
+        }
+
+        // Date and Time Display Functions
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date as mm/dd/yyyy
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `${month}/${day}/${year}`;
+            
+            // Format time as hh:mm:ss AM/PM
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const formattedTime = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+            
+            // Update the display elements
+            const dateElement = document.getElementById('current-date');
+            const timeElement = document.getElementById('current-time');
+            
+            if (dateElement) dateElement.textContent = formattedDate;
+            if (timeElement) timeElement.textContent = formattedTime;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern Timeline - {{ concern.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #8BC34A;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #4CAF50;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html, body {
+            min-height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            color: #8BC34A;
+        }
+
+        .nav-link.active i {
+            color: #ffffff;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .datetime-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-date i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-time i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .concern-details {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .concern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .concern-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .concern-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-processing {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .status-resolved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .timeline-container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .timeline-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 0; /* removed space reserved for left rail */
+            width: 100%; /* fits container width */
+            max-width: 1100px; /* optional: set a max width */
+            margin: 0 auto; /* center it */
+        }
+
+        .timeline::before {
+            display: none; /* hide left vertical line */
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .timeline-item::before {
+            display: none; /* hide timeline dots */
+        }
+
+        .timeline-header-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .timeline-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .timeline-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .timeline-action {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .timeline-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .message-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message-sender.you {
+            color: var(--primary-color);
+        }
+
+        .message-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .message-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .message-attachment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-attachment:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateX(5px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--border-color);
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            .concern-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/images/logo.png" alt="LSPU Logo">
+                <h2>PiyuKonek</h2>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('concern') }}" class="nav-link active">
+                        <i class="fas fa-exclamation-circle"></i>
+                        My Concerns
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('notifications') }}" class="nav-link">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('student_reminders') }}" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        Reminders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('student_profile') }}" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('logout') }}" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-left">
+                        <h1>
+                            <i class="fas fa-history"></i>
+                            Concern Timeline
+                        </h1>
+                        <div class="datetime-display">
+                            <div class="current-date">
+                                <i class="fas fa-calendar"></i>
+                                <span id="current-date"></span>
+                            </div>
+                            <div class="current-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="current-time"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <a href="{{ url_for('student_concern_timeline_download', concern_id=concern.id) }}" class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </a>
+
+                        <a href="{{ url_for('concern') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Concerns
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Concern Details -->
+                <div class="concern-details">
+                    <div class="concern-header">
+                        <div>
+                            <h2 class="concern-title">{{ concern.title }}</h2>
+                            <div class="concern-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    {{ concern.concern_type.title() }}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-flag"></i>
+                                    {{ concern.priority_level.title() }}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (concern.submitted_at|philippines_time).strftime('%B %d, %Y') if concern.submitted_at else '—' }}
+                                </div>
+                                {% if concern.status == 'resolved' and concern.resolved_at %}
+                                <div class="meta-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Resolved: {{ (concern.resolved_at|philippines_time).strftime('%B %d, %Y') if concern.resolved_at else '—' }}
+                                </div>
+                                {% elif concern.status == 'processing' %}
+                                <div class="meta-item">
+                                    <i class="fas fa-spinner"></i>
+                                    In Progress
+                                </div>
+                                {% else %}
+                                <div class="meta-item">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    Pending
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="status-badge status-{{ concern.status }}">
+                            {{ concern.status.title() }}
+                        </div>
+                    </div>
+                    <div class="concern-description">
+                        <h3>Description:</h3>
+                        <p>{{ concern.description }}</p>
+                        
+                        {% if concern.attachments %}
+                        <div class="concern-attachments" style="margin-top: 20px;">
+                            <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 12px;">
+                                <i class="fas fa-paperclip"></i> Attachments ({{ concern.attachments|length }})
+                            </h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                {% for attachment in concern.attachments %}
+                                <div class="attachment-item" style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    padding: 8px 12px;
+                                    background: var(--secondary-color);
+                                    border-radius: 8px;
+                                    border: 1px solid var(--border-color);
+                                    transition: all 0.3s ease;
+                                ">
+                                    {% set ext = attachment.file_type or attachment.original_filename.split('.')[-1].lower() %}
+                                    {% if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
+                                        <i class="fas fa-file-image" style="color: #4CAF50; font-size: 1.1rem;"></i>
+                                    {% elif ext == 'pdf' %}
+                                        <i class="fas fa-file-pdf" style="color: #e53e3e; font-size: 1.1rem;"></i>
+                                    {% elif ext in ['doc', 'docx'] %}
+                                        <i class="fas fa-file-word" style="color: #2563eb; font-size: 1.1rem;"></i>
+                                    {% else %}
+                                        <i class="fas fa-file" style="color: #6b7280; font-size: 1.1rem;"></i>
+                                    {% endif %}
+                                    <a href="{{ url_for('uploaded_file', filename=attachment.filename) }}" 
+                                       target="_blank" 
+                                       style="color: var(--text-primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                                        {{ attachment.original_filename }}
+                                    </a>
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                                        ({{ (attachment.file_size / 1024 / 1024)|round(2) }} MB)
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% elif concern.docs %}
+                        <!-- Legacy single file support -->
+                        <div class="concern-attachments" style="margin-top: 20px;">
+                            <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 12px;">
+                                <i class="fas fa-paperclip"></i> Attachment
+                            </h4>
+                            <div class="attachment-item" style="
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 8px;
+                                padding: 8px 12px;
+                                background: var(--secondary-color);
+                                border-radius: 8px;
+                                border: 1px solid var(--border-color);
+                            ">
+                                {% set ext = concern.docs.split('.')[-1].lower() %}
+                                {% if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
+                                    <i class="fas fa-file-image" style="color: #4CAF50; font-size: 1.1rem;"></i>
+                                {% elif ext == 'pdf' %}
+                                    <i class="fas fa-file-pdf" style="color: #e53e3e; font-size: 1.1rem;"></i>
+                                {% else %}
+                                    <i class="fas fa-file" style="color: #6b7280; font-size: 1.1rem;"></i>
+                                {% endif %}
+                                <a href="{{ url_for('uploaded_file', filename=concern.docs) }}" 
+                                   target="_blank" 
+                                   style="color: var(--text-primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                                    {{ concern.docs }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline-container">
+                    <div class="timeline-header">
+                        <h2>
+                            <i class="fas fa-stream"></i>
+                            Timeline of Events
+                        </h2>
+                    </div>
+
+                    {% if events %}
+                    <div class="timeline">
+                        <!-- All events sorted newest first -->
+                        {% for item in events %}
+                        {% if item.type == 'submission' %}
+                        <div class="timeline-item">
+                            <div class="timeline-header-item">
+                                <div class="timeline-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (item.timestamp|philippines_time).strftime('%B %d, %Y at %I:%M %p') if item.timestamp else '—' }}
+                                </div>
+                                <div class="timeline-status status-pending">Submitted</div>
+                            </div>
+                            <div class="timeline-action">
+                                <i class="fas fa-paper-plane" style="margin-right: 8px; color: var(--primary-color);"></i>
+                                Concern Submitted
+                            </div>
+                            <div class="timeline-description">
+                                Your concern "{{ concern.title }}" was successfully submitted and is now under review.
+                            </div>
+                        </div>
+                        {% elif item.type == 'history' %}
+                        {% set is_response = 'responded' in item.event.action.lower() or 'response' in item.event.action.lower() %}
+                        <div class="timeline-item" {% if is_response %}style="border-left-color: var(--success-color); background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(139, 195, 74, 0.05) 100%);"{% endif %}>
+                            <div class="timeline-header-item">
+                                <div class="timeline-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (item.event.timestamp|philippines_time).strftime('%B %d, %Y at %I:%M %p') if item.event.timestamp else '—' }}
+                                </div>
+                                <div class="timeline-status status-{{ item.event.status }}">
+                                    {% if is_response %}Guidance Response{% else %}{{ item.event.status.title() }}{% endif %}
+                                </div>
+                            </div>
+                            <div class="timeline-action">
+                                {% if is_response %}
+                                    <i class="fas fa-comment-dots" style="margin-right: 8px; color: var(--success-color);"></i>
+                                {% elif 'priority' in item.event.action.lower() %}
+                                    <i class="fas fa-flag" style="margin-right: 8px; color: var(--warning-color);"></i>
+                                {% elif 'assigned' in item.event.action.lower() %}
+                                    <i class="fas fa-user-check" style="margin-right: 8px; color: var(--primary-color);"></i>
+                                {% elif 'resolved' in item.event.action.lower() %}
+                                    <i class="fas fa-check-circle" style="margin-right: 8px; color: var(--success-color);"></i>
+                                {% elif 'processing' in item.event.action.lower() %}
+                                    <i class="fas fa-spinner" style="margin-right: 8px; color: #3b82f6;"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle" style="margin-right: 8px; color: var(--text-secondary);"></i>
+                                {% endif %}
+                                {{ item.event.action|replace(' by SSC', ' by Guidance')|replace('SSC', 'Guidance') }}
+                            </div>
+                            {% if is_response and concern.resolution_notes %}
+                            <div class="timeline-description" style="margin-top: 12px; padding: 16px; background: white; border-radius: 8px; border-left: 3px solid var(--success-color);">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+                                    <i class="fas fa-quote-left" style="color: var(--success-color); margin-right: 6px;"></i>
+                                    Response:
+                                </div>
+                                <div style="color: var(--text-primary); line-height: 1.7; white-space: pre-wrap;">{{ concern.resolution_notes }}</div>
+                                {% if concern.response_attachment %}
+                                <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                                    <a href="{{ url_for('uploaded_file', filename=concern.response_attachment) }}" class="message-attachment" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--secondary-color); border-radius: 8px; color: var(--primary-color); text-decoration: none; transition: all 0.3s ease; border: 1px solid var(--border-color);">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span>Response Attachment: {{ concern.response_attachment }}</span>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% elif item.event.actor_name %}
+                            <div class="timeline-description" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
+                                <i class="fas fa-user" style="margin-right: 4px;"></i>
+                                By: {{ item.event.actor_name }}
+                                {% if item.event.old_value and item.event.new_value %}
+                                <br>
+                                <span style="color: var(--text-secondary);">{{ item.event.old_value|title }}</span>
+                                <i class="fas fa-arrow-right" style="margin: 0 6px; color: var(--primary-color);"></i>
+                                <span style="color: var(--primary-color); font-weight: 600;">{{ item.event.new_value|title }}</span>
+                                {% elif item.event.new_value %}
+                                <br>
+                                <span style="color: var(--primary-color); font-weight: 600;">{{ item.event.new_value }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% elif item.type == 'guidance_response' %}
+                        <div class="timeline-item" style="border-left-color: var(--success-color); background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(139, 195, 74, 0.05) 100%);">
+                            <div class="timeline-header-item">
+                                <div class="timeline-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (item.timestamp|philippines_time).strftime('%B %d, %Y at %I:%M %p') if item.timestamp else '—' }}
+                                </div>
+                                <div class="timeline-status status-resolved">Guidance Response</div>
+                            </div>
+                            <div class="timeline-action">
+                                <i class="fas fa-comment-dots" style="margin-right: 8px; color: var(--success-color);"></i>
+                                Guidance Responded to Your Concern
+                            </div>
+                            <div class="timeline-description" style="margin-top: 12px; padding: 16px; background: white; border-radius: 8px; border-left: 3px solid var(--success-color);">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+                                    <i class="fas fa-quote-left" style="color: var(--success-color); margin-right: 6px;"></i>
+                                    Response:
+                                </div>
+                                <div style="color: var(--text-primary); line-height: 1.7; white-space: pre-wrap;">{{ item.response or concern.resolution_notes }}</div>
+                                {% if item.attachment or concern.response_attachment %}
+                                <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                                    <a href="{{ url_for('uploaded_file', filename=item.attachment or concern.response_attachment) }}" class="message-attachment" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--secondary-color); border-radius: 8px; color: var(--primary-color); text-decoration: none; transition: all 0.3s ease; border: 1px solid var(--border-color);">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span>Response Attachment: {{ item.attachment or concern.response_attachment }}</span>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% elif item.type == 'message' %}
+                        <div class="timeline-item">
+                            <div class="timeline-header-item">
+                                <div class="timeline-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (item.message.timestamp|philippines_time).strftime('%B %d, %Y at %I:%M %p') if item.message.timestamp else '—' }}
+                                </div>
+                                <div class="timeline-status status-processing">Message</div>
+                            </div>
+                            <div class="timeline-action">
+                                <i class="fas fa-envelope" style="margin-right: 8px; color: #3b82f6;"></i>
+                                {% if item.message.sender_id == student.id %}
+                                You sent a message
+                                {% else %}
+                                Staff sent a message
+                                {% endif %}
+                            </div>
+                            <div class="timeline-description">
+                                <div class="message-content">{{ item.message.content }}</div>
+                                {% if item.message.attachment_name %}
+                                <a href="{{ url_for('chat_file', filename=item.message.attachment_path) }}" class="message-attachment" target="_blank">
+                                    <i class="fas fa-paperclip"></i>
+                                    {{ item.message.attachment_name }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% elif item.type == 'resolved' %}
+                        <div class="timeline-item" style="border-left-color: var(--success-color); background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);">
+                            <div class="timeline-header-item">
+                                <div class="timeline-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ (item.timestamp|philippines_time).strftime('%B %d, %Y at %I:%M %p') if item.timestamp else '—' }}
+                                </div>
+                                <div class="timeline-status status-resolved">Resolved</div>
+                            </div>
+                            <div class="timeline-action">
+                                <i class="fas fa-check-circle" style="margin-right: 8px; color: var(--success-color);"></i>
+                                Concern Marked as Resolved
+                            </div>
+                            <div class="timeline-description">
+                                {% if concern.resolution_notes %}
+                                <div style="margin-top: 12px; padding: 16px; background: white; border-radius: 8px; border-left: 3px solid var(--success-color);">
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+                                        <i class="fas fa-quote-left" style="color: var(--success-color); margin-right: 6px;"></i>
+                                        Resolution Notes:
+                                    </div>
+                                    <div style="color: var(--text-primary); line-height: 1.7; white-space: pre-wrap;">{{ concern.resolution_notes }}</div>
+                                </div>
+                                {% endif %}
+                                {% if concern.response_attachment %}
+                                <div style="margin-top: 16px;">
+                                    <a href="{{ url_for('uploaded_file', filename=concern.response_attachment) }}" class="message-attachment" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--secondary-color); border-radius: 8px; color: var(--primary-color); text-decoration: none; transition: all 0.3s ease; border: 1px solid var(--border-color);">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span>Response Attachment: {{ concern.response_attachment }}</span>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <h3>No Timeline Events Yet</h3>
+                        <p>Timeline events will appear here as your concern progresses through the system.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add any interactive features here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize date and time display
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update every second
+
+            // Smooth scrolling for timeline
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+
+        // Date and Time Display Functions
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date as mm/dd/yyyy
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `${month}/${day}/${year}`;
+            
+            // Format time as hh:mm:ss AM/PM
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const formattedTime = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+            
+            // Update the display elements
+            const dateElement = document.getElementById('current-date');
+            const timeElement = document.getElementById('current-time');
+            
+            if (dateElement) dateElement.textContent = formattedDate;
+            if (timeElement) timeElement.textContent = formattedTime;
+        }
+    </script>
+</body>
+</html>

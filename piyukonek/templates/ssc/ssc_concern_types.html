@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Concern Types</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #45a049;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gradient-primary: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+        }
+        
+        body { 
+            margin: 0; 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-primary); 
+            font-size: 16px; 
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .dashboard-container { 
+            display: flex; 
+            min-height: 100vh; 
+        }
+        
+        .sidebar { 
+            width: 280px; 
+            background: #fff; 
+            padding: 25px; 
+            border-right: 1px solid var(--border-color); 
+            box-shadow: var(--shadow-lg); 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 1000;
+        }
+        
+        .sidebar-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding-bottom: 18px; 
+            border-bottom: 1px solid var(--border-color); 
+            margin-bottom: 18px; 
+        }
+        
+        .sidebar-header img { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 50%; 
+            box-shadow: var(--shadow-md);
+            object-fit: cover;
+            border: 3px solid #fff;
+        }
+        
+        .sidebar-header h2 { 
+            margin: 0; 
+            font-size: 1.2rem; 
+            font-weight: 700;
+        }
+        
+        .nav-menu { 
+            margin-top: 10px; 
+        }
+        
+        .nav-item { 
+            margin-bottom: 8px; 
+        }
+        
+        .nav-link { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 12px 14px; 
+            text-decoration: none; 
+            color: var(--text-secondary); 
+            border-radius: 12px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            font-weight: 600; 
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+        
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            left: 0;
+        }
+        
+        .nav-link i { 
+            width: 18px; 
+            text-align: center; 
+            color: var(--primary-color); 
+            transition: all 0.3s ease; 
+        }
+        
+        .nav-link:hover { 
+            color: #fff; 
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link:hover i { 
+            color: #fff; 
+            transform: scale(1.1);
+        }
+        
+        .nav-link.active { 
+            color: #fff; 
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+        
+        .nav-link.active i { 
+            color: #fff; 
+        }
+        
+        .main-content { 
+            flex: 1; 
+            padding: 30px; 
+            margin-left: 280px; 
+            background: transparent; 
+            min-height: 100vh; 
+            overflow-y: auto; 
+        }
+
+        /* Top bar */
+        .top-bar { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 24px 28px; 
+            background: var(--gradient-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            box-shadow: var(--shadow-lg); 
+            margin-bottom: 24px; 
+            backdrop-filter: blur(10px);
+        }
+        
+        .top-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+        }
+        
+        .top-icon { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 14px; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: var(--gradient-primary); 
+            color: #fff; 
+            box-shadow: var(--shadow-md); 
+            transition: all 0.3s ease;
+        }
+        
+        .top-icon:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .top-icon i { 
+            color: #fff; 
+            font-size: 1.2rem;
+        }
+        
+        .datetime-display { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: var(--text-primary); 
+            font-weight: 500; 
+            font-size: 0.9rem;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .datetime-display i {
+            color: var(--primary-color);
+            font-size: 0.85rem;
+        }
+        
+        .user-profile { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 12px 18px; 
+            background: var(--secondary-color); 
+            border-radius: 14px; 
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .user-profile img { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 3px solid #fff; 
+            box-shadow: var(--shadow-md); 
+        }
+        
+        .user-info h3 { 
+            margin: 0; 
+            font-size: 1rem; 
+            color: var(--text-primary); 
+            font-weight: 600; 
+        }
+        
+        .user-info p { 
+            margin: 0; 
+            font-size: 0.85rem; 
+            color: var(--text-secondary); 
+        }
+
+        /* Page content */
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0; 
+        }
+        
+        .header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 24px; 
+        }
+        
+        .header h1 { 
+            font-size: 1.8rem; 
+            margin: 0; 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card { 
+            background: var(--gradient-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            box-shadow: var(--shadow-md); 
+            margin-bottom: 24px; 
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .card-header { 
+            padding: 20px 24px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+        
+        .card-header strong {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .card-body { 
+            padding: 24px; 
+        }
+        
+        form.inline { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        
+        input[type=text] { 
+            padding: 14px 16px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            min-width: 280px; 
+            font-size: 0.95rem; 
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        input[type=text]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        button.btn { 
+            border: none; 
+            border-radius: 6px; 
+            padding: 6px 12px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: all 0.2s ease; 
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            position: relative;
+            overflow: hidden;
+            min-height: 28px;
+            justify-content: center;
+        }
+        
+        button.btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.3s ease;
+        }
+        
+        button.btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary { 
+            background: var(--primary-color); 
+            color: #fff; 
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2); 
+        }
+        
+        .btn-primary:hover { 
+            background: var(--primary-dark);
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3); 
+        }
+        
+        .btn-ghost { 
+            background: transparent; 
+            color: var(--text-secondary); 
+            border: 1px solid var(--border-color); 
+            box-shadow: none;
+        }
+        
+        .btn-ghost:hover {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn-danger { 
+            background: #ef4444; 
+            color: #fff; 
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-warning { 
+            background: #f59e0b; 
+            color: #fff; 
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+        }
+        
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* Icon styling */
+        button.btn i {
+            font-size: 0.7rem;
+            transition: transform 0.2s ease;
+        }
+        
+        button.btn:hover i {
+            transform: scale(1.1);
+        }
+        
+        /* Disabled state */
+        button.btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        button.btn:disabled:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.95rem; 
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        th, td { 
+            padding: 16px 12px; 
+            text-align: left; 
+        }
+        
+        th { 
+            font-weight: 700; 
+            color: #111827; 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            font-size: 0.9rem; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tbody tr { 
+            transition: all 0.3s ease;
+        }
+        
+        tbody tr:nth-child(even) { 
+            background: #fafbfc; 
+        }
+        
+        tbody tr:hover { 
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); 
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .row-actions { 
+            display: flex; 
+            gap: 6px; 
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .badge { 
+            display: inline-block; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            background: var(--gradient-primary); 
+            color: #fff; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .flash { 
+            margin-bottom: 16px; 
+            padding: 16px 20px; 
+            border-radius: 12px; 
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        
+        .flash.success { 
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); 
+            color: #065f46; 
+            border-left-color: #22c55e;
+        }
+        
+        .flash.error { 
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); 
+            color: #991b1b; 
+            border-left-color: #ef4444;
+        }
+        
+        a.back { 
+            text-decoration: none; 
+            color: var(--text-secondary); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s ease;
+        }
+        
+        a.back:hover { 
+            color: var(--primary-color); 
+            transform: translateX(-4px);
+        }
+        
+        .types-scroll { 
+            max-height: 65vh; 
+            overflow-y: auto; 
+            padding-right: 8px; 
+        }
+        
+        .types-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .types-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .types-scroll::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .types-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        .header-tools { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        
+        .search-input { 
+            padding: 12px 16px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            min-width: 240px; 
+            font-size: 0.95rem; 
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        /* Enhanced input styling for rename fields */
+        input[type="text"][name="name"]:focus {
+            outline: none !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .mobile-menu-toggle:hover { background: var(--primary-dark); }
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-overlay.show { display: block; }
+        @media (max-width: 1024px) {
+            .top-bar { flex-wrap: wrap; gap: 16px; }
+        }
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 70px 20px 20px; }
+            .top-bar { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .card-body { padding: 16px; }
+            form.inline { flex-direction: column; align-items: stretch; }
+            input[type=text] { min-width: 100%; }
+            .row-actions { flex-direction: column; gap: 8px; }
+        }
+        @media (max-width: 480px) {
+            .main-content { padding: 70px 15px 15px; }
+        }
+        
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .empty-state p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+    </style>
+    </head>
+<body>
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+                <h2>PiyuKonek</h2>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_dashboard') }}" class="nav-link{% if request.endpoint == 'ssc_dashboard' %} active{% endif %}"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_concerns') }}" class="nav-link{% if request.endpoint == 'ssc_concerns' %} active{% endif %}"><i class="fas fa-exclamation-circle"></i><span>Concerns</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_students') }}" class="nav-link{% if request.endpoint == 'ssc_students' %} active{% endif %}"><i class="fas fa-users"></i><span>Students</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_notifications') }}" class="nav-link{% if request.endpoint == 'ssc_notifications' %} active{% endif %}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_concern_types') }}" class="nav-link active"><i class="fas fa-tags"></i><span>Concern Types</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_profile') }}" class="nav-link{% if request.endpoint == 'ssc_profile' %} active{% endif %}"><i class="fas fa-user-edit"></i><span>Edit Profile</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_message') }}" class="nav-link{% if request.endpoint == 'ssc_message' %} active{% endif %}"><i class="fas fa-envelope-open-text"></i><span>Messages</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('ssc_analytics') }}" class="nav-link{% if request.endpoint == 'ssc_analytics' %} active{% endif %}"><i class="fas fa-chart-line"></i><span>Analytics</span></a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('logout') }}" class="nav-link" onclick="if(!confirm('Logout?')) return false;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-left">
+                    <span class="top-icon"><i class="fas fa-tags"></i></span>
+                    <h2 style="margin:0; font-size:1.25rem; color:var(--text-primary); font-weight:600;">Manage Concern Types</h2>
+                    <div class="datetime-display">
+                        <i class="fas fa-calendar"></i>
+                        <span id="current-date"></span>
+                        <i class="fas fa-clock"></i>
+                        <span id="current-time"></span>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    {% if ssc and ssc.profile_image %}
+                        <img src="{{ url_for('uploaded_file', filename=ssc.profile_image) }}" alt="Profile Picture">
+                    {% else %}
+                        <span style="width:60px;height:60px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e8f5e9;color:#4CAF50;border:2px solid #fff;box-shadow: var(--shadow-sm);"><i class="fas fa-user" style="font-size:26px;"></i></span>
+                    {% endif %}
+                    <div class="user-info">
+                        <h3>{{ ssc.fullname if ssc else 'Guidance' }}</h3>
+                        <p>{{ (ssc.position.replace('-', ' ').replace('_', ' ').title()) if ssc and ssc.position else 'Staff' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="header">
+                   
+                    
+                </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-plus-circle" style="color: var(--primary-color); font-size: 1.2rem;"></i>
+                    <strong>Add New Concern Type</strong>
+                </div>
+            </div>
+            <div class="card-body">
+                <form class="inline" action="{{ url_for('ssc_add_concern_type') }}" method="POST" onsubmit="return confirmAddConcernType(this)">
+                    <input type="text" name="name" placeholder="e.g. Scholarship, Mental Health, Academic Support" required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Type
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-check-circle" style="color: var(--success-color); font-size: 1.2rem;"></i>
+                <strong>Active Types</strong>
+                <span class="badge">{{ active_types|length if active_types else 0 }}</span>
+                </div>
+            </div>
+            <div class="card-body types-scroll">
+                {% if active_types %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Name</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th style="width:260px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in active_types %}
+                        <tr>
+                            <td>{{ t.name }}</td>
+                            <td>{{ (t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at) }}</td>
+                            <td>{{ (t.updated_at.strftime('%Y-%m-%d %H:%M') if t.updated_at) }}</td>
+                            <td>
+                                <div class="row-actions">
+                                    <form action="{{ url_for('ssc_update_concern_type', type_id=t.id) }}" method="POST" style="display:inline-flex; gap:6px;">
+                                        <input type="hidden" name="action" value="archive">
+                                        <button class="btn btn-ghost" type="submit" onclick="return confirm('Are you sure you want to archive this concern type? This action can be undone.')"><i class="fas fa-box-archive"></i> Archive</button>
+                                    </form>
+                                    <form action="{{ url_for('ssc_update_concern_type', type_id=t.id) }}" method="POST" style="display:inline-flex; gap:6px;">
+                                        <input type="hidden" name="action" value="rename">
+                                        <input type="text" name="name" placeholder="Rename..." style="min-width:120px; padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: #fff; transition: all 0.2s ease;">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-pen"></i> Rename</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-tags"></i>
+                        <h3>No Active Types</h3>
+                        <p>Start by adding your first concern type to get organized.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-archive" style="color: var(--text-secondary); font-size: 1.2rem;"></i>
+                <strong>Archived Types</strong>
+                <span class="badge">{{ archived_types|length if archived_types else 0 }}</span>
+                </div>
+            </div>
+            <div class="card-body types-scroll">
+                {% if archived_types %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Name</th>
+                            <th>Archived</th>
+                            <th style="width:220px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in archived_types %}
+                        <tr>
+                            <td>{{ t.name }}</td>
+                            <td>{{ (t.archived_at.strftime('%Y-%m-%d %H:%M') if t.archived_at) }}</td>
+                            <td>
+                                <div class="row-actions">
+                                    <form action="{{ url_for('ssc_update_concern_type', type_id=t.id) }}" method="POST" style="display:inline-flex; gap:6px;">
+                                        <input type="hidden" name="action" value="restore">
+                    <button class="btn btn-primary" type="submit" onclick="return confirm('Are you sure you want to restore this concern type?')"><i class="fas fa-rotate-left"></i> Restore</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-archive"></i>
+                        <h3>No Archived Types</h3>
+                        <p>Archived concern types will appear here when you archive them.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+<script>
+  // Enhanced date and time display
+  function updateDateTime(){
+    const now = new Date();
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const day = String(now.getDate()).padStart(2,'0');
+    const year = now.getFullYear();
+    const hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const dateEl = document.getElementById('current-date');
+    const timeEl = document.getElementById('current-time');
+    if(dateEl) dateEl.textContent = `${month}/${day}/${year}`;
+    if(timeEl) timeEl.textContent = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+  }
+
+  // Enhanced form submission with loading states
+  function handleFormSubmission(form) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Add loading state
+    submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+    submitBtn.disabled = true;
+    
+    // Re-enable after 3 seconds (in case of slow response)
+    setTimeout(() => {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }, 3000);
+  }
+
+  // Enhanced table row interactions
+  function enhanceTableInteractions() {
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.01)';
+        this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+      });
+      
+      row.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = 'none';
+      });
+    });
+  }
+
+  // Enhanced button interactions
+  function enhanceButtonInteractions() {
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+      // Add click ripple effect
+      btn.addEventListener('click', function(e) {
+        if (!this.disabled) {
+          const ripple = document.createElement('span');
+          const rect = this.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+          
+          ripple.style.cssText = `
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x}px;
+            top: ${y}px;
+          `;
+          
+          this.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        }
+      });
+      
+      btn.addEventListener('mouseenter', function() {
+        if (!this.disabled) {
+          this.style.transform = 'translateY(-1px)';
+        }
+      });
+      
+      btn.addEventListener('mouseleave', function() {
+        if (!this.disabled) {
+          this.style.transform = 'translateY(0)';
+        }
+      });
+    });
+  }
+
+  // Enhanced input focus effects
+  function enhanceInputInteractions() {
+    const inputs = document.querySelectorAll('input[type="text"]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-1px)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+  }
+
+  // Filter types function (enhanced)
+  function filterTypes() {
+    const q = (document.getElementById('typeSearch')?.value || '').toLowerCase();
+    const tables = document.querySelectorAll('table tbody');
+    
+    tables.forEach(table => {
+      const rows = table.querySelectorAll('tr');
+      let visibleCount = 0;
+      
+      rows.forEach(row => {
+        const nameCell = row.querySelector('td');
+        const text = (nameCell ? nameCell.textContent : '').toLowerCase();
+        const shouldShow = text.includes(q);
+        
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleCount++;
+      });
+      
+      // Update badge counts if search is active
+      const card = table.closest('.card');
+      const badge = card?.querySelector('.badge');
+      if (badge && q) {
+        badge.textContent = `${visibleCount} found`;
+      }
+    });
+  }
+
+  // Initialize everything when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function(){
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    
+    // Enhance interactions
+    enhanceTableInteractions();
+    enhanceButtonInteractions();
+    enhanceInputInteractions();
+    
+    // Handle form submissions
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+      form.addEventListener('submit', function(e) {
+        handleFormSubmission(this);
+      });
+    });
+    
+    // Add search functionality if search input exists
+    const searchInput = document.getElementById('typeSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', filterTypes);
+    }
+    
+    // Add smooth scrolling to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        card.style.transition = 'all 0.5s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, 100 * Array.from(cards).indexOf(card));
+    });
+  });
+
+  // Add confirmation for adding new concern type
+  function confirmAddConcernType(form) {
+    const nameInput = form.querySelector('input[name="name"]');
+    const concernTypeName = nameInput.value.trim();
+    
+    if (!concernTypeName) {
+      alert('Please enter a concern type name.');
+      return false;
+    }
+    
+    // Check if the concern type already exists (case-insensitive)
+    const existingTypes = document.querySelectorAll('tbody tr td:first-child');
+    for (let i = 0; i < existingTypes.length; i++) {
+      if (existingTypes[i].textContent.trim().toLowerCase() === concernTypeName.toLowerCase()) {
+        alert('A concern type with this name already exists. Please choose a different name.');
+        nameInput.focus();
+        return false;
+      }
+    }
+    
+    return confirm(`Are you sure you want to add "${concernTypeName}" as a new concern type?\n\nThis will make it available for students to select when submitting concerns.`);
+  }
+
+  function toggleMobileMenu() {
+    document.querySelector('.sidebar').classList.toggle('mobile-open');
+    document.querySelector('.mobile-overlay').classList.toggle('show');
+  }
+  function closeMobileMenu() {
+    document.querySelector('.sidebar').classList.remove('mobile-open');
+    document.querySelector('.mobile-overlay').classList.remove('show');
+  }
+  document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', closeMobileMenu));
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
+</script>
+</body>
+</html>
+
+

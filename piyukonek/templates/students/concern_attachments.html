@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern Attachments - {{ concern.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #8BC34A;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #4CAF50;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html, body {
+            min-height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            color: #8BC34A;
+        }
+
+        .nav-link.active i {
+            color: #ffffff;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .datetime-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-date i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-time i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .concern-details {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .concern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .concern-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .concern-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-processing {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .status-resolved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        /* Attachments Container */
+        .attachments-container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .attachments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .attachments-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attachments-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .attachments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .attachment-card {
+            background: var(--secondary-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attachment-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .attachment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .file-icon.pdf {
+            background: linear-gradient(135deg, #e53e3e, #dc2626);
+        }
+
+        .file-icon.image {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        }
+
+        .file-icon.document {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        .file-icon.text {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .file-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .file-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .attachment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1 1 calc(33.333% - 7px);
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            min-width: 110px;
+            white-space: nowrap;
+        }
+
+        .btn-view {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-download {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--border-color);
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid #4CAF50;
+            background: #fff;
+            color: #222;
+        }
+
+        .flash-message.success {
+            background: #f0fff4;
+            color: #2f855a;
+            border-left-color: #38a169;
+        }
+
+        .flash-message.error {
+            background: #fee;
+            color: #c53030;
+            border-left-color: #e53e3e;
+        }
+
+        .flash-message.info {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            border-left-color: #3182ce;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            .concern-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .attachments-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/images/logo.png" alt="LSPU Logo">
+                <h2>Student Portal</h2>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('concern') }}" class="nav-link active">
+                        <i class="fas fa-exclamation-circle"></i>
+                         My Concerns
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('notifications') }}" class="nav-link">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('student_reminders') }}" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        Reminders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('student_profile') }}" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('logout', tab=current_tab) }}" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}" id="flash-{{ loop.index }}">
+                                <span>{{ message }}</span>
+                                <button class="close-btn" onclick="closeFlashMessage('flash-{{ loop.index }}')" style="background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-left">
+                        <h1>
+                            <i class="fas fa-paperclip"></i>
+                            Concern Attachments
+                        </h1>
+                        <div class="datetime-display">
+                            <div class="current-date">
+                                <i class="fas fa-calendar"></i>
+                                <span id="current-date"></span>
+                            </div>
+                            <div class="current-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="current-time"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <a href="{{ url_for('concern') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Concerns
+                        </a>
+                        <a href="{{ url_for('student_concern_timeline', concern_id=concern.id) }}" class="btn btn-primary">
+                            <i class="fas fa-history"></i>
+                            View Timeline
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Concern Details -->
+                <div class="concern-details">
+                    <div class="concern-header">
+                        <div>
+                            <h2 class="concern-title">{{ concern.title }}</h2>
+                            <div class="concern-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    {{ concern.concern_type.title() }}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-flag"></i>
+                                    {{ concern.priority_level.title() }}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ concern.submitted_at.strftime('%B %d, %Y') }}
+                                </div>
+                                {% if concern.status == 'resolved' and concern.resolved_at %}
+                                <div class="meta-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Resolved: {{ concern.resolved_at.strftime('%B %d, %Y') }}
+                                </div>
+                                {% elif concern.status == 'processing' %}
+                                <div class="meta-item">
+                                    <i class="fas fa-spinner"></i>
+                                    In Progress
+                                </div>
+                                {% else %}
+                                <div class="meta-item">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    Pending
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="status-badge status-{{ concern.status }}">
+                            {{ concern.status.title() }}
+                        </div>
+                    </div>
+                    <div class="concern-description">
+                        <h3>Description:</h3>
+                        <p>{{ concern.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div class="attachments-container">
+                    <div class="attachments-header">
+                        <h2>
+                            <i class="fas fa-files-o"></i>
+                            Attachments
+                        </h2>
+                        <div class="attachments-count">
+                            {{ attachments|length }} file{{ 's' if attachments|length != 1 else '' }}
+                        </div>
+                    </div>
+
+                    {% if attachments %}
+                        <div class="attachments-grid">
+                            {% for attachment in attachments %}
+                                <div class="attachment-card" id="attachment-{{ attachment.id }}">
+                                    <div class="attachment-header">
+                                        {% set ext = attachment.file_type or attachment.original_filename.split('.')[-1].lower() %}
+                                        <div class="file-icon 
+                                            {% if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}image
+                                            {% elif ext == 'pdf' %}pdf
+                                            {% elif ext in ['doc', 'docx'] %}document
+                                            {% else %}text{% endif %}">
+                                            {% if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
+                                                <i class="fas fa-file-image"></i>
+                                            {% elif ext == 'pdf' %}
+                                                <i class="fas fa-file-pdf"></i>
+                                            {% elif ext in ['doc', 'docx'] %}
+                                                <i class="fas fa-file-word"></i>
+                                            {% else %}
+                                                <i class="fas fa-file-alt"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="file-info">
+                                            <h3>{{ attachment.original_filename }}</h3>
+                                            <p>{{ (attachment.file_size / 1024 / 1024)|round(2) }} MB • {{ attachment.uploaded_at.strftime('%B %d, %Y') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="attachment-actions">
+                                        <a href="{{ url_for('uploaded_file', filename=attachment.filename) }}" 
+                                           target="_blank" 
+                                           class="action-btn btn-view">
+                                            <i class="fas fa-eye"></i>
+                                            View
+                                        </a>
+                                        <a href="{{ url_for('download_attachment', attachment_id=attachment.id) }}" 
+                                           class="action-btn btn-download">
+                                            <i class="fas fa-download"></i>
+                                            Download
+                                        </a>
+                                        <button type="button" onclick="removeAttachment({{ attachment.id }}, '{{ attachment.original_filename }}')" 
+                                                class="action-btn btn-remove"
+                                                {% if concern.status != 'pending' %}disabled{% endif %}>
+                                            <i class="fas fa-trash"></i>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <h3>No Attachments Found</h3>
+                            <p>This concern doesn't have any attached files.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function removeAttachment(attachmentId, filename) {
+            if (!confirm(`Are you sure you want to remove "${filename}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/remove_attachment/${attachmentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the attachment card from the UI
+                    const attachmentCard = document.getElementById(`attachment-${attachmentId}`);
+                    if (attachmentCard) {
+                        attachmentCard.style.opacity = '0';
+                        attachmentCard.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            attachmentCard.remove();
+                            
+                            // Update the count
+                            const countElement = document.querySelector('.attachments-count');
+                            const currentCount = parseInt(countElement.textContent.split(' ')[0]);
+                            const newCount = currentCount - 1;
+                            countElement.textContent = `${newCount} file${newCount !== 1 ? 's' : ''}`;
+                            
+                            // Show empty state if no attachments left
+                            if (newCount === 0) {
+                                const grid = document.querySelector('.attachments-grid');
+                                grid.innerHTML = `
+                                    <div class="empty-state">
+                                        <i class="fas fa-folder-open"></i>
+                                        <h3>No Attachments Found</h3>
+                                        <p>This concern doesn't have any attached files.</p>
+                                    </div>
+                                `;
+                            }
+                        }, 300);
+                    }
+                    
+                    // Show success message
+                    showFlashMessage('Attachment removed successfully', 'success');
+                } else {
+                    showFlashMessage(data.message || 'Error removing attachment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFlashMessage('Error removing attachment', 'error');
+            });
+        }
+
+        function showFlashMessage(message, type) {
+            const flashContainer = document.querySelector('.content-wrapper');
+            const flashId = 'flash-' + Date.now();
+            
+            const flashMessage = document.createElement('div');
+            flashMessage.className = `flash-message ${type}`;
+            flashMessage.id = flashId;
+            flashMessage.innerHTML = `
+                <span>${message}</span>
+                <button class="close-btn" onclick="closeFlashMessage('${flashId}')" style="background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button>
+            `;
+            
+            flashContainer.insertBefore(flashMessage, flashContainer.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                closeFlashMessage(flashId);
+            }, 5000);
+        }
+
+        function closeFlashMessage(messageId) {
+            const message = document.getElementById(messageId);
+            if (message) {
+                message.style.opacity = '0';
+                message.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (message.parentNode) {
+                        message.parentNode.removeChild(message);
+                    }
+                }, 300);
+            }
+        }
+
+        // Auto-hide existing flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize date and time display
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update every second
+
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    if (message.parentNode) {
+                        closeFlashMessage(message.id);
+                    }
+                }, 5000);
+            });
+        });
+
+        // Date and Time Display Functions
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date as mm/dd/yyyy
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `${month}/${day}/${year}`;
+            
+            // Format time as hh:mm:ss AM/PM
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const formattedTime = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+            
+            // Update the display elements
+            const dateElement = document.getElementById('current-date');
+            const timeElement = document.getElementById('current-time');
+            
+            if (dateElement) dateElement.textContent = formattedDate;
+            if (timeElement) timeElement.textContent = formattedTime;
+        }
+    </script>
+</body>
+</html>

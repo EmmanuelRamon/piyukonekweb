@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#4CAF50">
+    
+    <title>{% block title %}PIYUKONEK System{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Mobile Responsive CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-responsive.css') }}">
+    
+    <!-- Custom CSS -->
+    {% block styles %}{% endblock %}
+    
+    <style>
+        /* Base mobile styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+        
+        /* Mobile-specific base styles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+            
+            /* Ensure all interactive elements are touch-friendly */
+            button, a, input, select, textarea {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Improve touch scrolling */
+            .scrollable {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle (if needed) -->
+    {% block mobile_menu_toggle %}{% endblock %}
+    
+    <!-- Mobile Overlay (if needed) -->
+    {% block mobile_overlay %}{% endblock %}
+    
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Mobile Enhancement Scripts -->
+    <script src="{{ url_for('static', filename='js/mobile-enhancements.js') }}"></script>
+    
+    <!-- Custom JavaScript -->
+    {% block scripts %}{% endblock %}
+    
+    <script>
+        // Mobile-specific initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    window.dispatchEvent(new Event('resize'));
+                }, 100);
+            });
+            
+            // Add mobile-specific classes
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-device');
+            }
+            
+            // Update on resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('mobile-device');
+                } else {
+                    document.body.classList.remove('mobile-device');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

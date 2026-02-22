@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify OTP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .otp-container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .resend-link {
+      display: none;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    .resend-link:hover {
+      text-decoration: underline;
+    }
+
+    #timer {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .flash-message {
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .flash-message.error,
+    .flash-message.danger,
+    .flash-message.warning {
+      background-color: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+    }
+
+    .flash-message.info,
+    .flash-message.success {
+      background-color: #efe;
+      color: #3c3;
+      border: 1px solid #cfc;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="otp-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <h2>Enter OTP</h2>
+    <p>An OTP has been sent to your email. Please enter it below to verify your account.</p>
+    {% if session.student_data and session.student_data.profile_image %}
+      <div style="margin-bottom: 18px;">
+        <img src="{{ url_for('uploaded_file', filename=session.student_data.profile_image) }}" alt="Profile Image" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #4CAF50; box-shadow: 0 2px 8px rgba(76,175,80,0.15);" />
+      </div>
+    {% else %}
+      <div style="margin-bottom: 18px; display:flex; align-items:center; justify-content:center;">
+        <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}"
+             alt="Default profile icon"
+             style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" />
+      </div>
+    {% endif %}
+    <form action="/verify_otp" method="POST">
+      <input type="text" name="otp" maxlength="6" placeholder="Enter 6-digit OTP" required />
+      <button type="submit">Verify</button>
+    </form>
+
+    <div id="timer">Resend available in <span id="countdown">2:00</span></div>
+    <a href="/resend_otp" class="resend-link" id="resendLink">Resend OTP</a>
+  </div>
+
+  <script>
+    let timeLeft = 120;
+    const countdownElement = document.getElementById('countdown');
+    const resendLink = document.getElementById('resendLink');
+    const timerElement = document.getElementById('timer');
+
+    const timer = setInterval(() => {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        resendLink.style.display = 'block';
+        timerElement.style.display = 'none';
+      }
+
+      timeLeft--;
+    }, 1000);
+  </script>
+</body>
+</html>

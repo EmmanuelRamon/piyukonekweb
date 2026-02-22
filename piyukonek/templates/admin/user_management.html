@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - PiyuKonek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #45a049;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: var(--secondary-color);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .user-profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Gradient style for file input button */
+        #admin-profile-upload[type="file"]::file-selector-button {
+            padding: 8px 12px;
+            margin-right: 15px;
+            border: none;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #admin-profile-upload[type="file"]::file-selector-button:hover {
+            background: linear-gradient(to right, #45a049, #7cb342);
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* User Management Styles */
+        .user-management-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 25px;
+        }
+
+        .management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .total-students-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(90deg, rgba(76, 175, 80, 0.12), rgba(139, 195, 74, 0.10));
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+            flex-shrink: 0;
+        }
+
+        .total-students-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(76, 175, 80, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .total-students-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .total-students-meta .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .total-students-meta .value {
+            font-size: 1.35rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 10px 20px;
+            border-radius: 12px;
+            width: 320px;
+            border: 1.5px solid #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .search-bar:focus-within {
+            border: 1.5px solid #4CAF50;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+        }
+        .search-bar i {
+            color: #64748b;
+            font-size: 1.1em;
+        }
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            color: #1e293b;
+            font-size: 1em;
+            width: 100%;
+            padding: 6px 0;
+        }
+
+        .add-user-btn {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .add-user-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .filter-select {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .user-role {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .role-student {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+        }
+
+        .role-ssc {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .role-admin {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background: var(--success-color);
+        }
+
+        .status-inactive {
+            background: var(--danger-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .edit-btn {
+            background: var(--primary-color);
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .page-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .sidebar-header h2,
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+
+            .management-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .filter-bar {
+                flex-wrap: wrap;
+            }
+
+            .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+            <h2>PiyuKonek</h2>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link{% if request.endpoint == 'admin_dashboard' %} active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('user_management') }}" class="nav-link{% if request.endpoint == 'user_management' %} active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_user_approval') }}" class="nav-link{% if request.endpoint == 'admin_user_approval' %} active{% endif %}">
+                    <i class="fas fa-user-check"></i>
+                    <span>User Approval</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_concern') }}" class="nav-link{% if request.endpoint == 'admin_concern' %} active{% endif %}">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Concerns</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_departments') }}" class="nav-link{% if request.endpoint == 'admin_departments' %} active{% endif %}">
+                    <i class="fas fa-building"></i>
+                    <span>Departments</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_courses') }}" class="nav-link{% if request.endpoint == 'admin_courses' %} active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Courses</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_notification') }}" class="nav-link{% if request.endpoint == 'admin_notification' %} active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_activities') }}" class="nav-link{% if request.endpoint == 'admin_activities' %} active{% endif %}">
+                    <i class="fas fa-list"></i>
+                    <span>Activities</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_concern_types') }}" class="nav-link{% if request.endpoint == 'admin_concern_types' %} active{% endif %}">
+                    <i class="fas fa-tags"></i>
+                    <span>Concern Types</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('admin_analytics') }}" class="nav-link{% if request.endpoint == 'admin_analytics' %} active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="confirmLogout(event)">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-users"></i>User Management</h1>
+            <div class="user-profile">
+                <form action="{{ url_for('admin_upload_profile_image') }}" method="post" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="admin-profile-upload" style="cursor:pointer; margin:0;">
+                        {% if admin and admin.profile_image %}
+                            <img src="{{ url_for('uploaded_file', filename=admin.profile_image) }}" alt="Profile Picture" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;">
+                        {% else %}
+                            <span style="width:60px;height:60px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e8f5e9;color:#4CAF50;border:2px solid #e2e8f0;">
+                                <i class="fas fa-user" style="font-size:28px;"></i>
+                            </span>
+                        {% endif %}
+                        <input id="admin-profile-upload" name="profile_image" type="file" accept="image/*" style="display:none;" onchange="this.form.submit()">
+                    </label>
+                    <div class="user-info">
+                        <h3>{{ admin.fullname if admin else 'Admin User' }}</h3>
+                        <p>{{ admin.email_address if admin else 'Administrator' }}</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="user-management-container">
+            <div class="management-header">
+                <div class="total-students-card" title="Total registered students">
+                    <div class="total-students-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="total-students-meta">
+                        <span class="label">Total Students</span>
+                        <span class="value">{{ total_students|default(students|length) }}</span>
+                    </div>
+                </div>
+                <div class="search-bar">
+                    <form method="get" action="{{ url_for('user_management') }}" style="display: flex; width: 100%; align-items: center; gap: 10px; background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search users..." value="{{ search|default('') }}" />
+                    </form>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <form method="get" action="{{ url_for('user_management') }}" style="display: flex; gap: 15px; width: 100%;">
+                    <input type="hidden" name="search" value="{{ search|default('') }}" />
+                    <select class="filter-select" name="role" onchange="this.form.submit()">
+                        <option value="" {% if role == '' %}selected{% endif %}>All Roles</option>
+                        <option value="student" {% if role == 'student' %}selected{% endif %}>Student</option>
+                        <option value="ssc" {% if role == 'ssc' %}selected{% endif %}>Guidance</option>
+                        <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                    <select class="filter-select" name="status" onchange="this.form.submit()">
+                        <option value="" {% if status == '' %}selected{% endif %}>All Status</option>
+                        <option value="online" {% if status == 'online' %}selected{% endif %}>Online</option>
+                        <option value="offline" {% if status == 'offline' %}selected{% endif %}>Offline</option>
+                    </select>
+                </form>
+            </div>
+
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Date Added</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Students -->
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <img src="{% if student.profile_image %}{{ url_for('uploaded_file', filename=student.profile_image) }}{% else %}{{ url_for('static', filename='images/default_avatar.jpg') }}{% endif %}" alt="User Avatar" class="user-avatar">
+                                <div class="user-details">
+                                    <span class="user-name">{{ student.fullname }}</span>
+                                    <span class="user-email">{{ student.email_address }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="user-role role-student">Student</span></td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-dot {% if student.is_online %}status-active{% else %}status-inactive{% endif %}"></span>
+                                <span>{% if student.is_online %}Active{% else %}Offline{% endif %}</span>
+                            </div>
+                        </td>
+                        <td>{% if student.created_at %}{{ student.created_at.strftime('%Y-%m-%d') }}{% else %}N/A{% endif %}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- SSC -->
+                    {% for ssc in sscs %}
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <img src="{% if ssc.profile_image %}{{ url_for('uploaded_file', filename=ssc.profile_image) }}{% else %}{{ url_for('static', filename='images/default_avatar.jpg') }}{% endif %}" alt="User Avatar" class="user-avatar">
+                                <div class="user-details">
+                                    <span class="user-name">{{ ssc.fullname }}</span>
+                                    <span class="user-email">{{ ssc.email_address }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="user-role role-ssc">Guidance</span></td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-dot {% if ssc.is_online %}status-active{% else %}status-inactive{% endif %}"></span>
+                                <span>{% if ssc.is_online %}Active{% else %}Offline{% endif %}</span>
+                            </div>
+                        </td>
+                        <td>{% if ssc.created_at %}{{ ssc.created_at.strftime('%Y-%m-%d') }}{% else %}N/A{% endif %}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Admins -->
+                    {% for admin in admins %}
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                {% if admin.profile_image %}
+                                    <img src="{{ url_for('uploaded_file', filename=admin.profile_image) }}" alt="User Avatar" class="user-avatar" style="border-radius:50%;">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="User Avatar" class="user-avatar" style="border-radius:50%;">
+                                {% endif %}
+                                <div class="user-details">
+                                    <span class="user-name">{{ admin.fullname }}</span>
+                                    <span class="user-email">{{ admin.email_address }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="user-role role-admin">Admin</span></td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-dot status-active"></span>
+                                <span>Active</span>
+                            </div>
+                        </td>
+                        <td>{% if admin.created_at %}{{ admin.created_at.strftime('%Y-%m-%d') }}{% else %}N/A{% endif %}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.querySelector('.search-bar input');
+            searchInput.addEventListener('input', function(e) {
+                // Add your search logic here
+                console.log('Searching for:', e.target.value);
+            });
+
+            // Filter functionality
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function(e) {
+                    // Add your filter logic here
+                    console.log('Filter changed:', e.target.value);
+                });
+            });
+
+            // Action buttons
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.classList.contains('edit-btn') ? 'edit' : 'delete';
+                    // Add your action logic here
+                    console.log('Action:', action);
+                });
+            });
+
+            // Pagination
+            const pageButtons = document.querySelectorAll('.page-btn');
+            pageButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) {
+                        // Add your pagination logic here
+                        console.log('Page changed');
+                    }
+                });
+            });
+        });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        }
+    </script>
+</body>
+</html>

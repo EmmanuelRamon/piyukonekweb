@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guidance Inbox - PiyuKonek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #45a049;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        html, body {
+            font-family: 'Poppins', sans-serif;
+        }
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+        }
+        .main-content {
+            min-height: 100vh;
+            height: 100vh;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+        }
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .mobile-menu-toggle:hover { background: var(--primary-dark); }
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-overlay.show { display: block; }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .nav-menu { margin-top: 20px; }
+        .nav-item { margin-bottom: 8px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+        .nav-link i { margin-right: 12px; font-size: 1.2rem; color: #4CAF50; transition: color 0.3s ease; }
+        .nav-link:hover i { color: #8BC34A; }
+        .nav-link.active i { color: #ffffff; }
+        .main-content { flex: 1; margin-left: 300px; padding: 0; }
+        .inbox-container {
+            display: flex;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            min-height: 650px;
+            overflow: visible;
+            max-height: 80vh;
+        }
+        .student-list {
+            width: 270px;
+            border-right: none;
+            background: #f7fafc;
+            border-radius: 22px 0 0 22px;
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 0 0;
+            box-shadow: none;
+        }
+        .student-list-header {
+            padding: 24px 18px 12px 18px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-bottom: none;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .student-list-header i {
+            font-size: 1.3rem;
+            color: #222;
+        }
+        .student-search {
+            margin: 12px 18px 10px 18px;
+            padding: 10px 18px;
+            border-radius: 24px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+            transition: border 0.2s;
+        }
+        .student-search:focus { border: 1.5px solid #4CAF50; }
+        .student-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 12px;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 12px;
+            margin: 0 12px 10px 12px;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+            border: none;
+            transition: box-shadow 0.2s, background 0.2s, border 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .student-item.active, .student-item:hover {
+            background: #f4fef6;
+            box-shadow: 0 4px 16px rgba(76,175,80,0.10);
+            border: 2px solid #4CAF50;
+        }
+        .avatar {
+            width: 60px !important;
+            height: 60px !important;
+            min-width: 60px !important;
+            min-height: 60px !important;
+            max-width: 60px !important;
+            max-height: 60px !important;
+            border-radius: 50% !important;
+            background: #e2e8f0;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.4rem !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #4CAF50 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: relative;
+        }
+        .avatar img {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            display: block;
+        }
+        .student-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1rem;
+            line-height: 1.2;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+        .conversation {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background: #f9fafb;
+            border-radius: 0 22px 22px 0;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            border-left: 1.5px solid var(--border-color);
+        }
+        .back-btn {
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            color: #fff !important;
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+            padding: 10px 22px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin: 24px 0 0 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, box-shadow 0.2s, color 0.2s, transform 0.2s;
+            max-width: 120px;
+        }
+        .back-btn:hover {
+            background: linear-gradient(90deg, #388e3c 0%, #689f38 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(76,175,80,0.18);
+            transform: translateX(-2px) scale(1.04);
+        }
+        .conversation-header {
+            background: #fff;
+            border-radius: 0 22px 0 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-bottom: 1.5px solid var(--border-color);
+            padding: 24px 32px 12px 32px;
+            font-size: 1.18rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .conversation-header .header-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2.5px solid var(--primary-color);
+            box-shadow: 0 1px 4px rgba(76,175,80,0.08);
+        }
+        .conversation-header .header-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .message-list {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: transparent;
+            border-radius: 0 0 22px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 60vh;
+        }
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 18px;
+            animation: fadeIn 0.4s;
+            gap: 18px;
+        }
+        .message-row.ssc { flex-direction: row-reverse; }
+        .message-row.admin { flex-direction: row-reverse; }
+        .message-row.admin .message-bubble {
+            background: linear-gradient(120deg, #f0f4ff 60%, #e3e9ff 100%);
+            color: #1e293b;
+            border: 1.5px solid #b6c6ec;
+            border-radius: 16px 16px 4px 16px;
+        }
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 12px;
+            overflow: hidden;
+            border: 2px solid var(--primary-light);
+            box-shadow: 0 1px 4px rgba(76,175,80,0.08);
+        }
+        .message-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .message-bubble {
+            background: linear-gradient(120deg, #f7fafc 60%, #e9f5ec 100%);
+            color: var(--text-primary);
+            border-radius: 16px 16px 16px 4px;
+            padding: 14px 20px;
+            max-width: 80%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: relative;
+            border: 1px solid var(--border-color);
+            font-size: 1.08rem;
+            transition: background 0.2s;
+        }
+        .message-row.ssc .message-bubble {
+            background: linear-gradient(120deg, #e6f9ed 60%, #d0f5e6 100%);
+            color: #15803d;
+            border: 1.5px solid #b6ecc7;
+            border-radius: 16px 16px 4px 16px;
+        }
+        .message-bubble strong {
+            display: block;
+            font-size: 1.05em;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+        .message-timestamp {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: none; }
+        }
+        @media (max-width: 1100px) {
+            .inbox-container { max-width: 100vw; border-radius: 0; }
+            .main-content { margin-left: 280px; }
+        }
+        @media (max-width: 900px) {
+            .mobile-menu-toggle { display: block; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding-top: 0; }
+            .inbox-container { max-width: 100vw; border-radius: 0; margin-top: 70px; }
+            .student-list { width: 100%; flex-direction: row; overflow-x: auto; border-radius: 0; flex-shrink: 0; }
+            .student-item { min-width: 120px; margin: 0 4px; flex-shrink: 0; }
+            .student-name { display: block; }
+            .conversation-header, .message-list { padding-left: 10px; padding-right: 10px; }
+            .conversation-header { padding: 18px 12px 10px 12px; }
+        }
+    </style>
+    <style>
+        .back-btn:hover { text-decoration: underline; color: #388e3c; }
+        @media (max-width: 900px) {
+            .back-btn { font-size: 1.2rem; margin-left: 10px; margin-top: 10px; }
+        }
+        .chatbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 32px 18px 32px;
+            background: #fff;
+            border-top: 1.5px solid var(--border-color);
+            border-radius: 0 0 22px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        .chatbox-input {
+            flex: 1;
+            resize: none;
+            border: 1.5px solid var(--border-color);
+            border-radius: 18px;
+            padding: 10px 16px;
+            font-size: 1.08rem;
+            font-family: inherit;
+            background: #f7fafc;
+            outline: none;
+            transition: border 0.2s;
+            min-height: 38px;
+            max-height: 90px;
+        }
+        .chatbox-input:focus {
+            border: 1.5px solid var(--primary-color);
+            background: #fff;
+        }
+        .chatbox-send {
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .chatbox-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chatbox-send:hover:not(:disabled) {
+            background: linear-gradient(90deg, #388e3c 0%, #689f38 100%);
+            box-shadow: 0 4px 16px rgba(76,175,80,0.18);
+            transform: scale(1.08);
+        }
+        @media (max-width: 900px) {
+            .chatbox { padding: 10px 8px; border-radius: 0 0 18px 18px; }
+        }
+        .chatbox-attach {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #e2e8f0 0%, #f7fafc 100%);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            margin-right: 4px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            border: none;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.04);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .chatbox-attach:hover {
+            background: linear-gradient(90deg, #d0f5e6 0%, #e6f0fa 100%);
+            color: #388e3c;
+            box-shadow: 0 4px 16px rgba(76,175,80,0.10);
+        }
+        .attachment-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 8px;
+            font-size: 0.98rem;
+            color: #388e3c;
+            background: #e9f5ec;
+            border-radius: 12px;
+            padding: 4px 10px;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .attachment-preview img {
+            max-width: 32px;
+            max-height: 32px;
+            border-radius: 6px;
+            margin-right: 4px;
+        }
+        .attachment-preview .remove-attachment {
+            color: #e53935;
+            margin-left: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        .delete-convo-btn {
+            background: none;
+            border: none;
+            color: #e53935;
+            font-size: 1.3rem;
+            margin-left: auto;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .delete-convo-btn:hover {
+            background: #ffeaea;
+            color: #b71c1c;
+        }
+        .student-profile-tooltip {
+            display: none;
+            position: absolute;
+            left: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            color: #222;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(60,72,88,0.13);
+            padding: 16px 22px;
+            min-width: 220px;
+            z-index: 999;
+            font-size: 0.98rem;
+            border: 1.5px solid #e2e8f0;
+            white-space: normal;
+        }
+        .student-avatar:hover .student-profile-tooltip {
+            display: block;
+        }
+        .student-profile-tooltip img {
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .student-profile-tooltip .initials {
+            width: 60px !important;
+            height: 60px !important;
+            font-size: 1.4rem !important;
+        }
+        @media (max-width: 900px) {
+            .student-profile-tooltip {
+                left: 0;
+                top: 110%;
+                transform: none;
+                min-width: 180px;
+                max-width: 90vw;
+            }
+        }
+        .msg-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.78em;
+            font-weight: 600;
+            vertical-align: middle;
+            letter-spacing: 0.01em;
+        }
+        .admin-badge {
+            background: #e3e9ff;
+            color: #1e40af;
+        }
+        .ssc-badge {
+            background: #e6f9ed;
+            color: #15803d;
+        }
+        .student-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+<button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+<div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+<div class="dashboard-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+            <h2>PiyuKonek</h2>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_dashboard') }}" class="nav-link{% if request.endpoint == 'ssc_dashboard' %} active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_concerns') }}" class="nav-link{% if request.endpoint == 'ssc_concerns' %} active{% endif %}">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Concerns</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_students') }}" class="nav-link{% if request.endpoint == 'ssc_students' %} active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Students</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_notifications') }}" class="nav-link{% if request.endpoint == 'ssc_notifications' %} active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_concern_types') }}" class="nav-link{% if request.endpoint == 'ssc_concern_types' %} active{% endif %}">
+                    <i class="fas fa-tags"></i>
+                    <span>Concern Types</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_profile') }}" class="nav-link{% if request.endpoint == 'ssc_profile' %} active{% endif %}">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_message') }}" class="nav-link{% if request.endpoint == 'ssc_message' %} active{% endif %}">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Messages</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('ssc_analytics') }}" class="nav-link{% if request.endpoint == 'ssc_analytics' %} active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="confirmLogout(event)">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="inbox-container">
+            <div class="student-list">
+                <div class="student-list-header"><i class="fas fa-users"></i> Students</div>
+                <input type="text" class="student-search" id="studentSearch" placeholder="Search students..." onkeyup="filterStudents()">
+                {% for s in students %}
+                {% set initials = s.fullname.split(' ') | map('slice', 0, 1) | join | upper %}
+                {% set is_image = s.profile_image and (s.profile_image.lower().endswith('.jpg') or s.profile_image.lower().endswith('.jpeg') or s.profile_image.lower().endswith('.png') or s.profile_image.lower().endswith('.gif') or s.profile_image.lower().endswith('.webp')) %}
+                <a href="{{ url_for('ssc_message', student_id=s.id, type=s.type) }}" class="student-item{% if selected_student and selected_student.id == s.id and selected_type == s.type %} active{% endif %}">
+                    <div class="avatar">
+                        {% if is_image %}
+                            <img src="{{ url_for('uploaded_file', filename=s.profile_image) }}" alt="{{ s.fullname }}">
+                        {% else %}
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                        {% endif %}
+                    </div>
+                    <span class="student-name">{{ s.fullname }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            <div class="conversation">
+                {% if selected_student %}
+                {% endif %}
+                <div class="conversation-header">
+                    {% if selected_student %}
+                        <div style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                            <span class="avatar">
+                            {% if selected_student.profile_image %}
+                                {% set initials = selected_student.fullname.split(' ') | map('slice', 0, 1) | join | upper %}
+                                {% set is_image = selected_student.profile_image and (selected_student.profile_image.lower().endswith('.jpg') or selected_student.profile_image.lower().endswith('.jpeg') or selected_student.profile_image.lower().endswith('.png') or selected_student.profile_image.lower().endswith('.gif') or selected_student.profile_image.lower().endswith('.webp')) %}
+                                {% if is_image %}
+                                    <img src="{{ url_for('uploaded_file', filename=selected_student.profile_image) }}" alt="{{ selected_student.fullname }}">
+                                {% else %}
+                                    <i class="fas fa-user" aria-hidden="true"></i>
+                                {% endif %}
+                            {% else %}
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                            {% endif %}
+                            </span>
+                            <div>{{ selected_student.fullname }}
+                                {% if selected_type == 'admin' %}
+                                    <span class="msg-badge admin-badge" style="margin-left:10px;">Admin</span>
+                                {% else %}
+                                    <span class="msg-badge student-badge" style="margin-left:10px;">Student</span>
+                                {% endif %}
+                            </div>
+                            <button class="delete-convo-btn" title="Delete Conversation" type="button" onclick="deleteConversation('{{ selected_student.id }}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    {% elif selected_student %}
+                        <div style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                            <span class="avatar">
+                            {% if selected_student.profile_image %}
+                                {% set initials = selected_student.fullname.split(' ') | map('slice', 0, 1) | join | upper %}
+                                {% set is_image = selected_student.profile_image and (selected_student.profile_image.lower().endswith('.jpg') or selected_student.profile_image.lower().endswith('.jpeg') or selected_student.profile_image.lower().endswith('.png') or selected_student.profile_image.lower().endswith('.gif') or selected_student.profile_image.lower().endswith('.webp')) %}
+                                {% if is_image %}
+                                    <img src="{{ url_for('uploaded_file', filename=selected_student.profile_image) }}" alt="{{ selected_student.fullname }}">
+                                {% else %}
+                                    <i class="fas fa-user" aria-hidden="true"></i>
+                                {% endif %}
+                            {% else %}
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                            {% endif %}
+                            </span>
+                            <div>{{ selected_student.fullname }}
+                                {% if selected_type == 'admin' %}
+                                    <span class="msg-badge admin-badge" style="margin-left:10px;">Admin</span>
+                                {% else %}
+                                    <span class="msg-badge student-badge" style="margin-left:10px;">Student</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <span style="color:#888;">Select a Student to view conversation</span>
+                    {% endif %}
+                </div>
+                <div class="message-list">
+                    {% if conversation %}
+                        {% for m in conversation %}
+                        <div class="message-row{% if m.is_ssc %} ssc{% endif %}{% if m.is_admin %} admin{% endif %}">
+                            <div class="avatar">
+                                {% if m.sender_profile_image %}
+                                    {% set initials = m.sender_name.split(' ') | map('slice', 0, 1) | join | upper %}
+                                    {% set is_image = m.sender_profile_image and (m.sender_profile_image.lower().endswith('.jpg') or m.sender_profile_image.lower().endswith('.jpeg') or m.sender_profile_image.lower().endswith('.png') or m.sender_profile_image.lower().endswith('.gif') or m.sender_profile_image.lower().endswith('.webp')) %}
+                                    <div class="avatar">
+                                        {% if is_image %}
+                                            <img src="{{ url_for('uploaded_file', filename=m.sender_profile_image) }}" alt="{{ m.sender_name }}">
+                                        {% else %}
+                                            <i class="fas fa-user" aria-hidden="true"></i>
+                                        {% endif %}
+                                    </div>
+                                {% elif m.is_admin %}
+                                    <i class="fas fa-user-shield" style="font-size:1.2em;color:#4CAF50;"></i>
+                                {% elif m.is_ssc %}
+                                    <i class="fas fa-user-tie" style="font-size:1.2em;color:#4CAF50;"></i>
+                                {% elif selected_student and selected_student.profile_image %}
+                                    {% set initials = selected_student.fullname.split(' ') | map('slice', 0, 1) | join | upper %}
+                                    {% set is_image = selected_student.profile_image and (selected_student.profile_image.lower().endswith('.jpg') or selected_student.profile_image.lower().endswith('.jpeg') or selected_student.profile_image.lower().endswith('.png') or selected_student.profile_image.lower().endswith('.gif') or selected_student.profile_image.lower().endswith('.webp')) %}
+                                    <div class="avatar">
+                                        {% if is_image %}
+                                            <img src="{{ url_for('uploaded_file', filename=selected_student.profile_image) }}" alt="{{ selected_student.fullname }}">
+                                        {% else %}
+                                            <i class="fas fa-user" aria-hidden="true"></i>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <i class="fas fa-user" aria-hidden="true"></i>
+                                {% endif %}
+                            </div>
+                            <div class="message-bubble">
+                                <strong>{{ m.sender_name }}
+                                    {% if m.is_admin %}
+                                        <span class="msg-badge admin-badge">Admin</span>
+                                    {% elif m.is_ssc %}
+                                        <span class="msg-badge ssc-badge">Guidance</span>
+                                    {% else %}
+                                        <span class="msg-badge student-badge">Student</span>
+                                    {% endif %}
+                                </strong>
+                                {{ m.content }}
+                                {% if m.attachment_path %}
+                                    <div style="margin-top:8px;">
+                                        {% if m.attachment_type and m.attachment_type.startswith('image') %}
+                                            <a href="{{ url_for('chat_file', filename=m.attachment_path) }}" target="_blank">
+                                                <img src="{{ url_for('chat_file', filename=m.attachment_path) }}" alt="attachment" style="max-width:120px;max-height:120px;border-radius:8px;box-shadow:0 2px 8px rgba(60,72,88,0.13);margin-bottom:4px;">
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('chat_file', filename=m.attachment_path) }}" target="_blank" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:#388e3c;font-size:0.98em;">
+                                                <i class="fas fa-paperclip"></i> {{ m.attachment_name or 'Download file' }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                <span class="message-timestamp">{{ m.timestamp }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% elif selected_student %}
+                        <div style="color:#888;text-align:center;padding:40px 0;">No messages yet with this student.</div>
+                    {% else %}
+                        <div style="color:#888;text-align:center;padding:40px 0;">Select a Student to view messages.</div>
+                    {% endif %}
+                </div>
+                {% if selected_student %}
+                <form class="chatbox" id="chatForm" autocomplete="off" enctype="multipart/form-data" onsubmit="return sendMessage(event)">
+                    <label for="chatAttachment" class="chatbox-attach" title="Attach file">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" id="chatAttachment" class="chatbox-file" style="display:none" onchange="showAttachment(event)">
+                    </label>
+                    <div id="attachmentPreview" class="attachment-preview" style="display:none;"></div>
+                    <textarea id="chatInput" class="chatbox-input" rows="1" placeholder="Type a message..." required></textarea>
+                    <button type="submit" class="chatbox-send"><i class="fas fa-paper-plane"></i></button>
+                </form>
+                {% else %}
+                <form class="chatbox" autocomplete="off" enctype="multipart/form-data" onsubmit="return false;" style="opacity:0.7;pointer-events:none;">
+                    <label class="chatbox-attach" title="Attach file">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" style="display:none" disabled>
+                    </label>
+                    <div class="attachment-preview" style="display:none;"></div>
+                    <textarea class="chatbox-input" rows="1" placeholder="Select a Student to start chatting" disabled></textarea>
+                    <button type="button" class="chatbox-send" disabled><i class="fas fa-paper-plane"></i></button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function toggleMobileMenu() {
+  const s = document.querySelector('.sidebar');
+  const o = document.querySelector('.mobile-overlay');
+  if (s) s.classList.toggle('mobile-open');
+  if (o) o.classList.toggle('show');
+}
+function closeMobileMenu() {
+  const s = document.querySelector('.sidebar');
+  const o = document.querySelector('.mobile-overlay');
+  if (s) s.classList.remove('mobile-open');
+  if (o) o.classList.remove('show');
+}
+document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', closeMobileMenu));
+window.addEventListener('resize', () => { if (window.innerWidth > 900) closeMobileMenu(); });
+function confirmLogout(event) {
+    event.preventDefault();
+    if (confirm('Are you sure you want to log out?')) {
+        window.location.href = "{{ url_for('logout') }}";
+    }
+}
+function filterStudents() {
+    var input = document.getElementById('studentSearch');
+    var filter = input.value.toUpperCase();
+    var items = document.querySelectorAll('.student-item');
+    items.forEach(function(item) {
+        var name = item.querySelector('.student-name');
+        if (name && name.textContent.toUpperCase().indexOf(filter) > -1) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+function showAttachment(event) {
+    var fileInput = event.target;
+    var preview = document.getElementById('attachmentPreview');
+    preview.innerHTML = '';
+    if (fileInput.files && fileInput.files[0]) {
+        var file = fileInput.files[0];
+        var fileName = file.name;
+        var fileType = file.type;
+        preview.style.display = 'flex';
+        if (fileType.startsWith('image/')) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" alt="attachment">' + fileName + '<span class="remove-attachment" onclick="removeAttachment()">&times;</span>';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '<i class="fas fa-file-alt"></i> ' + fileName + '<span class="remove-attachment" onclick="removeAttachment()">&times;</span>';
+        }
+    } else {
+        preview.style.display = 'none';
+    }
+}
+function removeAttachment() {
+    var fileInput = document.getElementById('chatAttachment');
+    var preview = document.getElementById('attachmentPreview');
+    fileInput.value = '';
+    preview.innerHTML = '';
+    preview.style.display = 'none';
+}
+function sendMessage(event) {
+    event.preventDefault();
+    var input = document.getElementById('chatInput');
+    var message = input.value.trim();
+    var fileInput = document.getElementById('chatAttachment');
+    var file = fileInput && fileInput.files[0];
+    
+    if (!message && !file) return false;
+    
+    // Get the selected student/admin ID
+    var selectedStudentId = "{{ selected_student.id if selected_student else '' }}";
+    var selectedType = "{{ selected_type if selected_type else 'student' }}";
+    
+    if (!selectedStudentId) {
+        alert('Please select a student or admin to message.');
+        return false;
+    }
+    
+    // Create FormData to handle both text and files
+    var formData = new FormData();
+    formData.append('recipient_id', selectedStudentId);
+    formData.append('recipient_type', selectedType);
+    // Revert: send the raw message content only
+    formData.append('content', message);
+    
+    // Add file to FormData if present
+    if (file) {
+        formData.append('file_0', file);
+    }
+    
+    // Send the message
+    fetch('/chat/messages', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Clear input and reset form
+            input.value = '';
+            input.style.height = '38px';
+            removeAttachment();
+            
+            // Reload the page to show the new message
+            window.location.reload();
+        } else {
+            alert('Failed to send message. Please try again.');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error sending message:', error);
+        alert('Failed to send message. Please try again.');
+    });
+    
+    return false;
+}
+function deleteConversation(studentId) {
+    if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) return;
+    fetch('/ssc/delete_conversation/' + studentId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ student_id: studentId })
+    })
+    .then(function(response) {
+        if (response.ok) {
+            window.location.href = "{{ url_for('ssc_message') }}";
+        } else {
+            alert('Failed to delete conversation.');
+        }
+    })
+    .catch(function() { alert('Failed to delete conversation.'); });
+}
+// Click-to-toggle for student profile tooltip on mobile
+function isMobile() {
+    return window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+}
+function closeAllTooltips() {
+    document.querySelectorAll('.student-profile-tooltip').forEach(function(tip) {
+        tip.style.display = 'none';
+    });
+}
+function setupStudentAvatarTooltips() {
+    document.querySelectorAll('.student-avatar').forEach(function(avatar) {
+        avatar.addEventListener('click', function(e) {
+            if (isMobile()) {
+                e.stopPropagation();
+                var tooltip = avatar.querySelector('.student-profile-tooltip');
+                if (tooltip) {
+                    var isVisible = tooltip.style.display === 'block';
+                    closeAllTooltips();
+                    tooltip.style.display = isVisible ? 'none' : 'block';
+                }
+            }
+        });
+        // Prevent tooltip from closing when clicking inside it
+        var tooltip = avatar.querySelector('.student-profile-tooltip');
+        if (tooltip) {
+            tooltip.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    setupStudentAvatarTooltips();
+    if (isMobile()) {
+        document.addEventListener('click', function() {
+            closeAllTooltips();
+        });
+    }
+    // Re-attach chat input listeners if present
+    var chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('input', function() {
+            this.style.height = '38px';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('chatForm').requestSubmit();
+            }
+        });
+    }
+});
+</script>
+</body>
+</html> 

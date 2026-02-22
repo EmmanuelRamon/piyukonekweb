@@ -1,0 +1,800 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern Reminders - PiyuKonek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #8BC34A;
+            --primary-dark: #8BC34A;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #4CAF50;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html, body {
+            min-height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 138vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 90px;
+            height: 90px;
+            margin-right: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            color: #8BC34A;
+        }
+
+        .nav-link.active i {
+            color: #ffffff;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--secondary-color);
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .datetime-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-date i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        .current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .current-time i {
+            color: #4CAF50;
+            font-size: 1rem;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 24px;
+        }
+
+        .flash-message {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flash-message.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .flash-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Reminders Container */
+        .reminders-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        /* Tabs for Active / Archive */
+        .reminders-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 16px 16px 0 16px;
+        }
+
+        .tab-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+        }
+
+        .tab-count {
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            font-size: 0.85em;
+        }
+
+        .reminders-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 24px 32px;
+        }
+
+        .reminders-header h3 {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .reminders-header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .reminders-content {
+            padding: 32px;
+        }
+
+        .reminder-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .reminder-item.urgent {
+            border-left: 4px solid var(--danger-color);
+            background: #fff5f5;
+        }
+
+        .reminder-item.warning {
+            border-left: 4px solid var(--primary-color);
+            background: #f1f8e9;
+        }
+
+        .reminder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .reminder-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .reminder-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .status-urgent {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .status-warning {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .reminder-details {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .detail-item i {
+            color: var(--primary-color);
+        }
+
+        .reminder-description {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e68900;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .reminder-details {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .reminder-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LSPU Logo">
+                <h2>PiyuKonek</h2>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('concern') }}" class="nav-link">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>My Concerns</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('notifications') }}" class="nav-link">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                </div>
+                            <div class="nav-item">
+                <a href="{{ url_for('student_reminders') }}" class="nav-link active">
+                    <i class="fas fa-clock"></i>
+                    <span>Reminders</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a href="{{ url_for('student_profile') }}" class="nav-link">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+            </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="confirmLogout(event)">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-clock"></i>
+                        Concern Reminders
+                    </h1>
+                    <div class="datetime-display">
+                        <div class="current-date">
+                            <i class="fas fa-calendar"></i>
+                            <span id="current-date"></span>
+                        </div>
+                        <div class="current-time">
+                            <i class="fas fa-clock"></i>
+                            <span id="current-time"></span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="checkReminders()">
+                    <i class="fas fa-sync"></i>
+                    Check Reminders
+                </button>
+            </div>
+
+            <!-- Reminders Container -->
+            <div class="reminders-container">
+                <div class="reminders-header">
+                    <h3>Smart Reminders</h3>
+                    <p>Track your pending concerns and get notified when they need attention.</p>
+                </div>
+
+                <div class="reminders-tabs">
+                    {% set active_concerns = pending_concerns|selectattr('days_pending', 'lt', 3)|list if pending_concerns else [] %}
+                    {% set archived_concerns = pending_concerns|selectattr('days_pending', 'ge', 3)|list if pending_concerns else [] %}
+                    <button type="button" class="tab-btn active" id="tab-active">Active <span class="tab-count">{{ active_concerns|length }}</span></button>
+                    <button type="button" class="tab-btn" id="tab-archive">Archive <span class="tab-count">{{ archived_concerns|length }}</span></button>
+                </div>
+
+                <div class="reminders-content" id="content-active">
+                    {% if active_concerns %}
+                        {% for concern in active_concerns %}
+                            <div class="reminder-item {% if concern.days_pending >= 5 %}urgent{% elif concern.days_pending >= 3 %}warning{% endif %}">
+                                <div class="reminder-header">
+                                    <div>
+                                        <div class="reminder-title">{{ concern.title }}</div>
+                                        <div class="reminder-description">{{ concern.description[:100] }}{% if concern.description|length > 100 %}...{% endif %}</div>
+                                    </div>
+                                    <div class="reminder-status {% if concern.days_pending >= 5 %}status-urgent{% else %}status-warning{% endif %}">
+                                        {{ concern.days_pending }} days pending
+                                    </div>
+                                </div>
+                                
+                                <div class="reminder-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>Submitted: {{ concern.submitted_at.strftime('%B %d, %Y') }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ concern.concern_type|title }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Priority: {{ concern.priority_level|title }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="reminder-actions">
+                                    <a href="{{ url_for('concern') }}#concern-{{ concern.id }}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>No Pending Concerns</h3>
+                            <p>Great! You don't have any concerns that need reminders. All your concerns are either resolved or still within the normal processing time.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Archive Content -->
+                <div class="reminders-content" id="content-archive" style="display:none;">
+                    {% if archived_concerns %}
+                        {% for concern in archived_concerns %}
+                            <div class="reminder-item warning">
+                                <div class="reminder-header">
+                                    <div>
+                                        <div class="reminder-title">{{ concern.title }}</div>
+                                        <div class="reminder-description">{{ concern.description[:100] }}{% if concern.description|length > 100 %}...{% endif %}</div>
+                                    </div>
+                                    <div class="reminder-status status-urgent">
+                                        Archived ({{ concern.days_pending }} days pending)
+                                    </div>
+                                </div>
+                                <div class="reminder-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>Submitted: {{ concern.submitted_at.strftime('%B %d, %Y') }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ concern.concern_type|title }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Priority: {{ concern.priority_level|title }}</span>
+                                    </div>
+                                </div>
+                                <div class="reminder-actions">
+                                    <a href="{{ url_for('concern') }}#concern-{{ concern.id }}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-archive"></i>
+                            <h3>No Archived Concerns</h3>
+                            <p>Concerns older than 3 days without resolution will appear here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize date and time display
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update every second
+
+            // Tabs switching logic
+            const tabActive = document.getElementById('tab-active');
+            const tabArchive = document.getElementById('tab-archive');
+            const contentActive = document.getElementById('content-active');
+            const contentArchive = document.getElementById('content-archive');
+
+            function setActiveTab(tab) {
+                if (tab === 'active') {
+                    tabActive.classList.add('active');
+                    tabArchive.classList.remove('active');
+                    contentActive.style.display = '';
+                    contentArchive.style.display = 'none';
+                } else {
+                    tabArchive.classList.add('active');
+                    tabActive.classList.remove('active');
+                    contentArchive.style.display = '';
+                    contentActive.style.display = 'none';
+                }
+            }
+
+            tabActive && tabActive.addEventListener('click', () => setActiveTab('active'));
+            tabArchive && tabArchive.addEventListener('click', () => setActiveTab('archive'));
+        });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        }
+
+        // Date and Time Display Functions
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date as mm/dd/yyyy
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `${month}/${day}/${year}`;
+            
+            // Format time as hh:mm:ss AM/PM
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const formattedTime = `${displayHours}:${minutes}:${seconds} ${ampm}`;
+            
+            // Update the display elements
+            const dateElement = document.getElementById('current-date');
+            const timeElement = document.getElementById('current-time');
+            
+            if (dateElement) dateElement.textContent = formattedDate;
+            if (timeElement) timeElement.textContent = formattedTime;
+        }
+
+        function checkReminders() {
+            fetch("{{ url_for('check_reminders') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Reminders checked successfully! Check your notifications for updates.');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error checking reminders.');
+            });
+        }
+
+        function contactSupport(concernId) {
+            // Redirect to messaging or contact support
+            alert('Contact support functionality will be implemented here.');
+        }
+    </script>
+</body>
+</html> 

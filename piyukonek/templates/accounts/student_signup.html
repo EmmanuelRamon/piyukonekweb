@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Sign-Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background: url('/static/images/lspu.jfif') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* Flash Message Styles */
+    .flash-messages {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .flash-message {
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideInRight 0.3s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .flash-message.error {
+      background-color: #fee;
+      color: #c53030;
+      border-left: 4px solid #e53e3e;
+    }
+
+    .flash-message.success {
+      background-color: #f0fff4;
+      color: #2f855a;
+      border-left: 4px solid #38a169;
+    }
+
+    .flash-message.info {
+      background-color: #ebf8ff;
+      color: #2b6cb0;
+      border-left: 4px solid #3182ce;
+    }
+
+    .flash-message.danger {
+      background-color: #fed7d7;
+      color: #c53030;
+      border-left: 4px solid #e53e3e;
+    }
+
+    .flash-message .close-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 10px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .flash-message .close-btn:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Email Duplication Modal */
+    .email-duplication-modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .email-duplication-modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .email-duplication-content {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.3s ease-out;
+      text-align: center;
+      position: relative;
+    }
+
+    .email-duplication-content .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #fee 0%, #fed7d7 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: #e53e3e;
+    }
+
+    .email-duplication-content h3 {
+      color: #1e293b;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .email-duplication-content p {
+      color: #64748b;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .email-duplication-content .warning-text {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #92400e;
+    }
+
+    .email-duplication-content .close-modal-btn {
+      background: linear-gradient(to right, #4CAF50, #8BC34A);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .email-duplication-content .close-modal-btn:hover {
+      background: linear-gradient(to right, #45a049, #7cb342);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    .flash-message.fade-out {
+      animation: slideOutRight 0.3s ease-in forwards;
+    }
+
+    .signup-container {
+      background: rgba(255, 255, 255, 0.96);
+      padding: 40px 32px;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 850px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+      font-size: 2.4rem;
+      font-weight: 600;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
+      font-size: 0.95rem;
+    }
+
+    .required-asterisk {
+      color: #e74c3c;
+      margin-left: 3px;
+    }
+
+    .input-icon-container {
+      position: relative; /* Needed to position the icon */
+      display: flex; /* Align icon and input */
+      align-items: center; /* Vertically center icon */
+      width: 100%; /* Take full width of parent */
+    }
+
+    .input-icon-container i {
+      position: absolute;
+      left: 18px;
+      color: #000000;
+      font-size: 1.1rem;
+      z-index: 1;
+      pointer-events: none;
+      transition: color 0.3s ease;
+    }
+
+    .form-group input:focus + .input-icon-container i,
+    .form-group select:focus + .input-icon-container i {
+        color: #ffffff;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;              /* Fix: input fields take full width */
+      box-sizing: border-box;   /* Include padding/border in width */
+      padding: 14px 16px 14px 50px; /* Increased left padding for icon */
+      border: 1px solid #ddd; /* Lighter and thinner border */
+      border-radius: 10px;
+      font-size: 1rem;
+      background-color: #f8f8f8;
+      color: #333;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+        border-color: #a0a0a0; /* Darker border on hover */
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #4CAF50;
+      background-color: #fff;
+      outline: none;
+      box-shadow: 0 0 6px rgba(76, 175, 80, 0.15);
+    }
+
+    .form-group input.error,
+    .form-group select.error {
+        border-color: #e74c3c; /* Red border for error */
+    }
+
+    .form-group input.error + .input-icon-container i,
+    .form-group select.error + .input-icon-container i {
+        color: #e74c3c; /* Red icon for error */
+    }
+
+    .form-group .error-message {
+        color: #e74c3c; /* Red text for error message */
+        font-size: 0.85rem;
+        margin-top: 5px; /* Space above the message */
+    }
+
+    .form-group input::placeholder {
+        color: #999; /* Adjusted placeholder color */
+        opacity: 1; /* Ensure placeholder is not transparent */
+    }
+
+    input[type="file"] {
+      background-color: #fff; /* White background for file input */
+      padding: 12px 14px 12px 50px; /* Adjusted padding for file input with icon */
+      cursor: pointer; /* Indicate it's clickable */
+    }
+
+    input[type="file"]::file-selector-button {
+      padding: 8px 12px;
+      margin-right: 15px;
+      border: none;
+      background: linear-gradient(to right, #4CAF50, #8BC34A);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: linear-gradient(to right, #45a049, #7cb342);
+    }
+
+    button {
+      grid-column: span 2;
+      padding: 15px;
+      background: linear-gradient(to right, #4CAF50, #8BC34A);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #45a049, #7cb342);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+        background: linear-gradient(to right, #3d8b40, #689f38);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transform: translateY(1px);
+    }
+
+    .login-link {
+      grid-column: span 2;
+      text-align: center;
+      margin-top: 25px; /* Increased margin above link for more space */
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .login-link a {
+      color: #4CAF50;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .login-link a:hover {
+      color: #8BC34A;
+      text-decoration: underline;
+    }
+
+    .password-note {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      border-left: 3px solid #4CAF50;
+    }
+
+    .password-note i {
+      color: #4CAF50;
+      font-size: 0.9rem;
+    }
+
+    /* Terms and Conditions Styles */
+    .terms-container {
+      margin-top: 15px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      background-color: #fff;
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .checkbox-label:hover input ~ .checkmark {
+      border-color: #4CAF50;
+    }
+
+    .checkbox-label input:checked ~ .checkmark {
+      background-color: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .checkbox-label input:checked ~ .checkmark::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .terms-link {
+      color: #4CAF50;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .terms-link:hover {
+      color: #8BC34A;
+      text-decoration: underline;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #222;
+      margin: 0;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background-color: #f0f0f0;
+      color: #666;
+    }
+
+    .modal-body {
+      line-height: 1.6;
+      color: #444;
+    }
+
+    .modal-body h3 {
+      color: #222;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .modal-body p {
+      margin-bottom: 12px;
+    }
+
+    .modal-body ul {
+      margin-bottom: 15px;
+      padding-left: 20px;
+    }
+
+    .modal-body li {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 640px) {
+      form {
+        grid-template-columns: 1fr;
+        gap: 12px; /* Slightly smaller gap on mobile */
+      }
+
+      .form-group.full-width, button, .login-link {
+        grid-column: auto !important; /* Ensure full width on mobile */
+      }
+
+      .input-icon-container i {
+        left: 12px; /* Adjust icon position on mobile */
+        font-size: 1rem; /* Adjust icon size on mobile */
+      }
+
+      .form-group input, .form-group select {
+        padding: 12px 14px 12px 40px; /* Adjusted padding on mobile */
+      }
+
+      input[type="file"] {
+        padding: 10px 14px 10px 40px; /* Adjusted padding on mobile for file input */
+      }
+
+      .signup-container {
+        padding: 30px 20px; /* Adjusted padding on mobile */
+      }
+
+      h2 {
+        font-size: 2rem; /* Adjusted header size on mobile */
+        margin-bottom: 25px; /* Adjusted margin on mobile */
+      }
+
+      .form-group label {
+        font-size: 0.9rem; /* Adjusted label size on mobile */
+      }
+
+      button {
+        font-size: 1rem; /* Adjusted button font size on mobile */
+      }
+
+      .login-link {
+        font-size: 0.85rem; /* Slightly smaller link on mobile */
+      }
+    }
+
+    /* Animation for form elements */
+    .form-group,
+    button,
+    .login-link {
+        opacity: 0; /* Start hidden */
+        animation: fadeInUpDelayed 0.7s ease-out forwards; /* Slightly longer animation */
+    }
+
+    /* Stagger animation delay */
+    .form-group:nth-child(1) { animation-delay: 0.3s; }
+    .form-group:nth-child(2) { animation-delay: 0.35s; }
+    .form-group:nth-child(3) { animation-delay: 0.4s; }
+    .form-group:nth-child(4) { animation-delay: 0.45s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.55s; }
+    .form-group:nth-child(7) { animation-delay: 0.6s; }
+    .form-group:nth-child(8) { animation-delay: 0.65s; }
+    .form-group:nth-child(9) { animation-delay: 0.7s; }
+    button { animation-delay: 0.72s; } /* Adjusted delay */
+    .login-link { animation-delay: 0.78s; } /* Adjusted delay */
+
+    @keyframes fadeInUpDelayed {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+  </style>
+</head>
+<body>
+  <!-- Flash Messages Container -->
+  <div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}" id="flash-{{ loop.index }}">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="closeFlashMessage('flash-{{ loop.index }}')">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Email Duplication Modal -->
+  <div id="emailDuplicationModal" class="email-duplication-modal">
+    <div class="email-duplication-content">
+      <div class="icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Email Already Registered</h3>
+      <p id="emailDuplicationMessage">This email address is already in use.</p>
+      <div class="warning-text">
+        <strong><i class="fas fa-info-circle"></i> Important:</strong> Each email address can only be used for one account type (Student, Guidance Staff, or Admin). Please use a different email address to continue.
+      </div>
+      <button class="close-modal-btn" onclick="closeEmailDuplicationModal()">I Understand</button>
+    </div>
+  </div>
+
+  <div class="signup-container">
+    <h2>Student Sign-Up</h2>
+    <form action="/register_student" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="firstname">First Name<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-user"></i> <!-- User icon -->
+            <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="lastname">Last Name<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-user"></i> <!-- User icon -->
+            <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-at"></i> <!-- At symbol icon -->
+            <input type="text" id="username" name="username" placeholder="Enter a username" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="student_id">Student ID Number<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-id-badge"></i> <!-- ID icon -->
+            <input type="text" id="student_id" name="student_id" placeholder="Enter your Student ID (e.g., 0123-0321)" required />
+        </div>
+        <div class="error-message" id="student_id_error" style="display: none;"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-envelope"></i> <!-- Envelope icon -->
+            <input type="email" id="email" name="email" placeholder="Enter your valid email address" required />
+        </div>
+        <div class="error-message" id="email_error" style="display: none;"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="department">College Department<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-building"></i> <!-- Building icon -->
+            <select id="department" name="department" required>
+              <option value="" disabled selected>Select Department</option>
+              {% for dept in departments %}
+                <option value="{{ dept.code }}">{{ dept.name }} ({{ dept.code }})</option>
+              {% endfor %}
+            </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="course">Course<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-book"></i> <!-- Book icon -->
+            <select id="course" name="course" required>
+              <option value="" disabled selected>Select Course</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="year">Year Level<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-calendar-alt"></i> <!-- Calendar icon -->
+            <select id="year" name="year" required>
+              <option value="" disabled selected>Select Year Level</option>
+              <option value="1st Year">First Year</option>
+              <option value="2nd Year">Second Year</option>
+              <option value="3rd Year">Third Year</option>
+              <option value="4th Year">Fourth Year</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="cor">Certificate of Registration (PDF/Image)<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-file-alt"></i> <!-- File icon -->
+            <input type="file" id="cor" name="cor" accept=".pdf,.jpg,.jpeg,.png" required />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="student_id_card">Student ID (PDF/Image)<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-id-card"></i> <!-- ID card icon -->
+            <input type="file" id="student_id_card" name="student_id_card" accept=".pdf,.jpg,.jpeg,.png" required />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="profile_image">Profile Image (optional)</label>
+        <div class="input-icon-container">
+            <i class="fas fa-image"></i> <!-- Image icon -->
+            <input type="file" id="profile_image" name="profile_image" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp" />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="password">Create Password<span class="required-asterisk">*</span></label>
+        <div class="input-icon-container">
+            <i class="fas fa-lock"></i> <!-- Lock icon -->
+            <input type="password" id="password" name="password" placeholder="Create your password" required />
+        </div>
+        <div class="password-note">
+          <i class="fas fa-info-circle"></i>
+          Password must be at least 8 characters long and contain only letters and numbers.
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <div class="terms-container">
+          <label class="checkbox-label">
+            <input type="checkbox" id="terms_accepted" name="terms_accepted" required />
+            <span class="checkmark"></span>
+            I agree to the <a href="#" onclick="showTermsModal()" class="terms-link">Terms and Conditions</a> and <a href="#" onclick="showPrivacyModal()" class="terms-link">Data Privacy Policy</a>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit">Register</button>
+
+      <div class="login-link">
+        Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Terms and Conditions Modal -->
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Terms and Conditions</h2>
+        <button class="close-modal" onclick="closeModal('termsModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By registering for the Piyukonek Student Concern Management System, you agree to be bound by these Terms and Conditions.</p>
+        
+        <h3>2. System Usage</h3>
+        <ul>
+          <li>You agree to use the system only for legitimate academic concerns and inquiries</li>
+          <li>You will not submit false, misleading, or inappropriate content</li>
+          <li>You will respect the privacy and rights of other users</li>
+          <li>You will not attempt to gain unauthorized access to the system</li>
+        </ul>
+        
+        <h3>3. Account Responsibility</h3>
+        <ul>
+          <li>You are responsible for maintaining the confidentiality of your account credentials</li>
+          <li>You must notify the institution immediately of any unauthorized use</li>
+          <li>You are responsible for all activities conducted under your account</li>
+        </ul>
+        
+        <h3>4. Content Guidelines</h3>
+        <ul>
+          <li>All submitted concerns must be truthful and accurate</li>
+          <li>Content must be respectful and professional</li>
+          <li>No harassment, discrimination, or inappropriate language is permitted</li>
+          <li>Attachments must be relevant and appropriate</li>
+        </ul>
+        
+        <h3>5. System Availability</h3>
+        <p>The institution reserves the right to modify, suspend, or discontinue the system at any time without prior notice.</p>
+        
+        <h3>6. Termination</h3>
+        <p>The institution may terminate or suspend your access to the system for violations of these terms or for any other reason deemed appropriate.</p>
+        
+        <h3>7. Changes to Terms</h3>
+        <p>These terms may be updated from time to time. Continued use of the system constitutes acceptance of any changes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Privacy Policy Modal -->
+  <div id="privacyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Data Privacy Policy</h2>
+        <button class="close-modal" onclick="closeModal('privacyModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>1. Information We Collect</h3>
+        <ul>
+          <li><strong>Personal Information:</strong> Full name, student ID, email address, course, department, year level</li>
+          <li><strong>Academic Information:</strong> Course details, department, year level</li>
+          <li><strong>Documents:</strong> Certificate of Registration, Student ID card, profile images</li>
+          <li><strong>System Usage:</strong> Concerns submitted, messages, attachments, system interactions</li>
+        </ul>
+        
+        <h3>2. How We Use Your Information</h3>
+        <ul>
+          <li>To process and respond to your academic concerns</li>
+          <li>To verify your student status and eligibility</li>
+          <li>To communicate with you regarding your concerns</li>
+          <li>To improve our services and system functionality</li>
+          <li>To comply with legal and regulatory requirements</li>
+        </ul>
+        
+        <h3>3. Data Security</h3>
+        <ul>
+          <li>We implement appropriate security measures to protect your personal information</li>
+          <li>Your data is stored securely and accessed only by authorized personnel</li>
+          <li>We use encryption and secure protocols for data transmission</li>
+          <li>Regular security audits are conducted to maintain data protection</li>
+        </ul>
+        
+        <h3>4. Data Sharing</h3>
+        <ul>
+          <li>Your information is shared only with authorized staff members involved in addressing your concerns</li>
+          <li>We do not sell, trade, or rent your personal information to third parties</li>
+          <li>Information may be shared when required by law or to protect institutional interests</li>
+        </ul>
+        
+        <h3>5. Data Retention</h3>
+        <ul>
+          <li>Your personal information is retained for the duration of your enrollment</li>
+          <li>Concern records are maintained for academic and administrative purposes</li>
+          <li>Data may be archived or deleted according to institutional retention policies</li>
+        </ul>
+        
+        <h3>6. Your Rights</h3>
+        <ul>
+          <li>You have the right to access your personal information</li>
+          <li>You can request corrections to inaccurate information</li>
+          <li>You may request deletion of your data, subject to legal and administrative requirements</li>
+          <li>You can withdraw consent for data processing, though this may affect system access</li>
+        </ul>
+        
+        <h3>7. Contact Information</h3>
+        <p>For questions about this privacy policy or to exercise your rights, please contact the institution's Data Protection Officer or IT department.</p>
+        
+        <h3>8. Updates to Privacy Policy</h3>
+        <p>This privacy policy may be updated periodically. You will be notified of significant changes through the system or institutional communications.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check for email duplication messages and show modal
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(function(message) {
+        const messageText = message.textContent.toLowerCase();
+        // Check if message is about email duplication
+        if (messageText.includes('email') && (messageText.includes('already') || messageText.includes('registered') || messageText.includes('used'))) {
+          const modal = document.getElementById('emailDuplicationModal');
+          const modalMessage = document.getElementById('emailDuplicationMessage');
+          if (modal && modalMessage) {
+            modalMessage.textContent = message.querySelector('span').textContent;
+            modal.classList.add('show');
+          }
+        }
+        
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(function() {
+          if (message.parentNode) {
+            message.classList.add('fade-out');
+            setTimeout(function() {
+              if (message.parentNode) {
+                message.parentNode.removeChild(message);
+              }
+            }, 300);
+          }
+        }, 5000);
+      });
+    });
+
+    // Close email duplication modal
+    function closeEmailDuplicationModal() {
+      const modal = document.getElementById('emailDuplicationModal');
+      if (modal) {
+        modal.classList.remove('show');
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('emailDuplicationModal');
+      if (event.target === modal) {
+        closeEmailDuplicationModal();
+      }
+    }
+
+    // Manual close function
+    function closeFlashMessage(messageId) {
+      const message = document.getElementById(messageId);
+      if (message) {
+        message.classList.add('fade-out');
+        setTimeout(function() {
+          if (message.parentNode) {
+            message.parentNode.removeChild(message);
+          }
+        }, 300);
+      }
+    }
+
+    // Modal functions
+    function showTermsModal() {
+      document.getElementById('termsModal').style.display = 'block';
+    }
+
+    function showPrivacyModal() {
+      document.getElementById('privacyModal').style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const termsModal = document.getElementById('termsModal');
+      const privacyModal = document.getElementById('privacyModal');
+      
+      if (event.target === termsModal) {
+        termsModal.style.display = 'none';
+      }
+      if (event.target === privacyModal) {
+        privacyModal.style.display = 'none';
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        document.getElementById('termsModal').style.display = 'none';
+        document.getElementById('privacyModal').style.display = 'none';
+      }
+    });
+
+    // Course data mapping for each department (injected from server)
+    const courseData = {{ dept_courses | tojson }};
+
+    // Function to populate course dropdown based on selected department
+    function updateCourseDropdown() {
+      const departmentSelect = document.getElementById('department');
+      const courseSelect = document.getElementById('course');
+      const selectedDepartment = departmentSelect.value;
+
+      // Clear existing options except the first one
+      courseSelect.innerHTML = '<option value="" disabled selected>Select Course</option>';
+
+      // If a department is selected, populate with its courses
+      if (selectedDepartment && courseData[selectedDepartment]) {
+        courseData[selectedDepartment].forEach(function(course) {
+          const option = document.createElement('option');
+          option.value = course;
+          option.textContent = course;
+          courseSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Function to validate Student ID format (XXXX-XXXX)
+    function validateStudentID(studentId) {
+      const studentIdPattern = /^\d{4}-\d{4}$/;
+      return studentIdPattern.test(studentId);
+    }
+
+    // Function to format Student ID as user types
+    function formatStudentID(input) {
+      let value = input.value.replace(/\D/g, ''); // Remove non-digits
+      
+      if (value.length >= 4) {
+        value = value.substring(0, 4) + '-' + value.substring(4, 8);
+      }
+      
+      input.value = value;
+    }
+
+    // Function to show/hide error message
+    function showStudentIDError(message) {
+      const errorElement = document.getElementById('student_id_error');
+      const inputElement = document.getElementById('student_id');
+      
+      if (message) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        inputElement.classList.add('error');
+      } else {
+        errorElement.style.display = 'none';
+        inputElement.classList.remove('error');
+      }
+    }
+
+    // Function to validate email format
+    function validateEmail(email) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailPattern.test(email);
+    }
+
+    // Function to show/hide email error message
+    function showEmailError(message) {
+      const errorElement = document.getElementById('email_error');
+      const inputElement = document.getElementById('email');
+      
+      if (message) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        inputElement.classList.add('error');
+      } else {
+        errorElement.style.display = 'none';
+        inputElement.classList.remove('error');
+      }
+    }
+
+    // Add event listener to department dropdown
+    document.addEventListener('DOMContentLoaded', function() {
+      const departmentSelect = document.getElementById('department');
+      const studentIdInput = document.getElementById('student_id');
+      const emailInput = document.getElementById('email');
+      
+      departmentSelect.addEventListener('change', updateCourseDropdown);
+      
+      // Student ID validation
+      studentIdInput.addEventListener('input', function() {
+        formatStudentID(this);
+        
+        const value = this.value;
+        if (value.length > 0) {
+          if (!validateStudentID(value)) {
+            if (value.length < 9) {
+              showStudentIDError('Student ID must be in format XXXX-XXXX');
+            } else {
+              showStudentIDError('Invalid Student ID format. Use XXXX-XXXX');
+            }
+          } else {
+            showStudentIDError('');
+          }
+        } else {
+          showStudentIDError('');
+        }
+      });
+
+      // Validate on blur (when user leaves the field)
+      studentIdInput.addEventListener('blur', function() {
+        const value = this.value;
+        if (value.length > 0 && !validateStudentID(value)) {
+          showStudentIDError('Student ID must be in format XXXX-XXXX');
+        }
+      });
+
+      // Email validation
+      emailInput.addEventListener('input', function() {
+        const value = this.value;
+        if (value.length > 0) {
+          if (!value.includes('@')) {
+            showEmailError('Email address must contain @ symbol');
+          } else if (!validateEmail(value)) {
+            showEmailError('Please enter a valid email address (e.g., user@example.com)');
+          } else {
+            showEmailError('');
+          }
+        } else {
+          showEmailError('');
+        }
+      });
+
+      // Validate email on blur
+      emailInput.addEventListener('blur', function() {
+        const value = this.value;
+        if (value.length > 0) {
+          if (!value.includes('@')) {
+            showEmailError('Email address must contain @ symbol');
+          } else if (!validateEmail(value)) {
+            showEmailError('Please enter a valid email address (e.g., user@example.com)');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

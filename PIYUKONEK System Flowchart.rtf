@@ -1,0 +1,164 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0\fswiss Arial;}{\f1\fmodern Consolas;}}
+\paperw12240\paperh15840\margl1440\margr1440\margt1440\margb1440
+\fs24
+
+\b PIYUKONEK System Flowchart\b0\par
+\pard\sb120\sa200 A high-level flow of the system across the three user roles: Students, SSC, and Admin.\par
+\par
+
+\b 1) Overall System Flow\b0\par
+\f1
+Start
+  |
+  v
+Login / Sign Up
+  |
+  v
+Determine Role (Student / SSC / Admin)
+  |\
+  | \
+  |  \
+  |   +--> Student Flow --------------+
+  |                                    |
+  |   +--> SSC Flow -------------------+--> System DB / Files (attachments, audit)
+  |                                    |
+  +--> Admin Flow ---------------------+
+  |
+  v
+Logout / Session Timeout
+  |
+  v
+End\par
+\f0\par
+
+\b 2) Student Flow\b0\par
+\f1
+Start (Student)
+  |
+  v
+View Dashboard & Notifications
+  |
+  v
+Create / Edit Concern
+  |
+  +--> Add Description, Category, Attachments
+  |
+  v
+Submit Concern
+  |
+  v
+System Saves Concern (DB) and Files (Uploads)
+  |
+  v
+SSC/Admin Review & Update Status / Deadline
+  |
+  v
+Receive Updates & Messages
+  |
+  v
+Provide Additional Info if requested
+  |
+  v
+Concern Resolved?
+  |         \
+  |          \
+  |           +-- No: Wait / Respond to messages
+  |
+  +-- Yes --> Rate & Give Feedback
+                 |
+                 v
+               End (Student)\par
+\f0\par
+
+\b 3) SSC Flow\b0\par
+\f1
+Start (SSC)
+  |
+  v
+View Assigned Concerns
+  |
+  v
+Open Concern Detail
+  |
+  +--> Read Description, Attachments, Timeline
+  |
+  v
+Communicate with Student (Messages / Notifications)
+  |
+  v
+Set / Update Status and Deadline
+  |
+  v
+Request Additional Info if needed
+  |
+  v
+Resolve or Escalate
+  |         \
+  |          \
+  |           +-- Escalate to Admin
+  |
+  +-- Resolve --> Mark as Resolved
+                     |
+                     v
+                   Await Student Rating/Feedback
+                     |
+                     v
+                   End (SSC)\par
+\f0\par
+
+\b 4) Admin Flow\b0\par
+\f1
+Start (Admin)
+  |
+  v
+User Management (Approve Users, Set Roles)
+  |
+  v
+View All Concerns & Analytics
+  |
+  v
+Assign / Reassign Concerns to SSC
+  |
+  v
+Update Status / Deadlines / Notes
+  |
+  v
+Monitor Messages, Notifications, Attachments
+  |
+  v
+Handle Escalations, Close Concerns
+  |
+  v
+Export Data / Audit Activities
+  |
+  v
+End (Admin)\par
+\f0\par
+
+\b 5) Data & Storage Flow\b0\par
+\f1
+Inputs (Forms, Messages, Ratings)
+   |
+   v
+Validation (server-side)
+   |
+   v
+Database (concerns, users, statuses, deadlines, ratings)
+   |
+   v
+File Storage (uploads: images, pdf, etc.)
+   |
+   v
+Notifications (in-app; optional email/SMS if configured)\par
+\f0\par
+
+\b Notes\b0\par
+- Login sessions are managed via the web app; roles gate access to pages like `admin_concern.html`, `ssc_concern.html`, and student dashboards.\par
+- Attachments are stored under `uploads/`; concern timelines and messages appear in the concern detail pages.\par
+- Deadlines and statuses are set by SSC/Admin and surfaced to students via notifications.\par
+- Ratings/feedback are captured after resolution for quality tracking.\par
+}
+
+
+
