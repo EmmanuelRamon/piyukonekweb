@@ -655,7 +655,7 @@ def register_student():
         }
         session['otp'] = otp
 
-     try:
+        try:
             resend.Emails.send({
                 "from": MAIL_DEFAULT_SENDER,
                 "to": email,
