@@ -655,17 +655,23 @@ def register_student():
         }
         session['otp'] = otp
 
-        try:
-            if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
-                flash("Email not configured. Add MAIL_USERNAME and MAIL_PASSWORD to .env (see .env.example)", "danger")
-            else:
-                msg = MailMessage('Your OTP Verification Code', recipients=[email])
-                msg.body = f"Hello {fullname},\n\nYour OTP code is: {otp}\n\nThank you for registering."
-                mail.send(msg)
-                flash("OTP has been sent to your email address.", "info")
+     try:
+            resend.Emails.send({
+                "from": MAIL_DEFAULT_SENDER,
+                "to": email,
+                "subject": "Piyukonek OTP Verification Code",
+                "html": f"""
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2>Hello {fullname},</h2>
+                    <p>Your OTP code is: <strong style="font-size: 20px;">{otp}</strong></p>
+                    <p>Thank you for registering!</p>
+                </div>
+                """
+            })
+            flash("OTP has been sent to your email address.", "info")
         except Exception as e:
-            print(f"[MAIL ERROR] {e}")
-            flash("Failed to send OTP. Check .env has correct MAIL_USERNAME, MAIL_PASSWORD (Gmail App Password).", "danger")
+            print(f"RESEND ERROR: {e}")
+            flash("Failed to send OTP. Please try again later.", "danger")
 
         return render_template('accounts/students_otp.html')
 
