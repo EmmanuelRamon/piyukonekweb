@@ -5957,30 +5957,30 @@ def send_concern_reply_email(student_email, student_name, concern_title, resolut
     if has_attachment:
         attachment_info = "\n\nRESPONSE ATTACHMENT:\n------------------\nA file has been attached to this response. Please log in to the portal to view and download the attachment."
     
-    msg = MailMessage(
-        subject=f"[LSPU PiyuKonek] Concern Resolution: {concern_title}",
-        recipients=[student_email],
-        body=f"""Dear {student_name},
+    try:
+        import resend
+        import os
+        resend.api_key = os.environ.get('RESEND_API_KEY')
 
-We are pleased to inform you that your concern has been addressed by the Guidance staffs.
+        email_html = f"""
+        <p>Dear {student_name},</p>
+        <p>We are pleased to inform you that your concern has been addressed by the Guidance staffs.</p>
+        <p><strong>CONCERN DETAILS:</strong><br>
+        Title: {concern_title}<br>
+        Resolved by: {responder_name} ({responder_role})</p>
+        <p><strong>RESOLUTION FEEDBACK:</strong><br>
+        {resolution_notes}{attachment_info}</p>
+        <p>Best regards,<br>{responder_name}<br>{responder_role}<br>LSPU PiyuKonek Support Team</p>
+        """
 
-CONCERN DETAILS:
----------------
-Title: {concern_title}
-Processing / Resolved by: {responder_name} ({responder_role})
-
-RESOLUTION FEEDBACK:
-------------------
-{resolution_notes}{attachment_info}
-
-For more detailed information or if you need further assistance, please log in to the LSPU PiyuKonek portal.
-
-Best regards,
-{responder_name}
-{responder_role}
-LSPU PiyuKonek Support Team"""
-    )
-    mail.send(msg)
+        resend.Emails.send({
+            "from": os.environ.get('MAIL_DEFAULT_SENDER'),
+            "to": student_email,
+            "subject": f"[LSPU PiyuKonek] Concern Resolution: {concern_title}",
+            "html": email_html
+        })
+    except Exception as e:
+        print(f"[MAIL ERROR] {e}")
 
 @app.route('/student/concern/<int:concern_id>/timeline')
 @login_required('student')
