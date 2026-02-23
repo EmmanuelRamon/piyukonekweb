@@ -2468,10 +2468,23 @@ def admin_approve_student(student_id):
     student.status = 'active'
     db.session.commit()
     # Send email notification
-    try:
-        msg = MailMessage('PiyuKonek Registration Approved', recipients=[student.email_address])
-        msg.body = f"Hello {student.fullname},\n\nYour registration has been approved! You can now log in to your PiyuKonek account.\n\nThank you for registering.\n\n- PiyuKonek Team"
-        mail.send(msg)
+   # Palitan ang lines 2471-2474 sa image_c8ebb4.png nito:
+try:
+    import resend
+    import os
+    
+    resend.api_key = os.environ.get('RESEND_API_KEY')
+    
+    params = {
+        "from": os.environ.get('MAIL_DEFAULT_SENDER'), # noreply@piyukonekweb.site
+        "to": [student.email_address],
+        "subject": "PiyuKonek Registration Approved",
+        "html": f"<p>Hello {student.fullname},</p><p>Your registration has been approved! You can now log in to your PiyuKonek account.</p>"
+    }
+    
+    resend.Emails.send(params)
+except Exception as e:
+    print(f"[MAIL ERROR] {e}")
     except Exception as e:
         print(f"[MAIL ERROR] {e}")
     # Notify all admins
