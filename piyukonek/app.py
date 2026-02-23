@@ -1,4 +1,5 @@
 import pymysql
+import resend
 pymysql.install_as_MySQLdb()
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
 from flask_sqlalchemy import SQLAlchemy
@@ -75,15 +76,9 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 # Email Configuration (from env vars; fallback for local dev when .env not set)
-_is_production = os.environ.get('FLASK_ENV') == 'production'
-# Email Configuration - Kinukuha ang data mula sa Railway Variables
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+# Email Configuration - Gamit ang Resend API
+resend.api_key = os.environ.get('RESEND_API_KEY')
+MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'onboarding@resend.dev')
 
 # API Keys (from env vars - never commit real keys)
 app.config['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY', '')
