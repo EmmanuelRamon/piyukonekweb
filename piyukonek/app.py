@@ -1,7 +1,7 @@
 import pymysql
 import resend
 pymysql.install_as_MySQLdb()
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
+from flask import Flask, render_template, mail, message, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
@@ -5212,7 +5212,8 @@ def forgot_password():
         email = request.form['email']
         user = None
         user_type = None
-        # Try to find user in all tables
+
+        # 1. Paghahanap sa user sa lahat ng tables
         student = Student.query.filter_by(email_address=email).first()
         if student:
             user = student
@@ -5231,24 +5232,32 @@ def forgot_password():
                     user = User.query.filter_by(email=email).first()
                     if user:
                         user_type = user.user_type
+
+        # 2. Proseso ng pagpapadala ng reset email
         if user:
             token = serializer.dumps({'email': email, 'user_type': user_type}, salt='password-reset-salt')
             reset_url = url_for('reset_password', token=token, _external=True)
+            
             try:
-                msg = MailMessage(
-    subject='PiyuKonek Password Reset',
-    sender=app.config.get('MAIL_DEFAULT_SENDER'),
-    recipients=[email]
-)
+                # Pinalitan ang MailMessage ng Message at inayos ang indentation
+                msg = Message(
+                    subject='PiyuKonek Password Reset',
+                    sender=app.config.get('MAIL_DEFAULT_SENDER'),
+                    recipients=[email]
+                )
                 msg.body = f"Hello,\n\nTo reset your password, click the link below:\n{reset_url}\n\nIf you did not request this, please ignore this email.\n\n- PiyuKonek Team"
+                
                 mail.send(msg)
                 flash('A password reset link has been sent to your email address.', 'info')
+                
             except Exception as e:
                 print(f"[MAIL ERROR] {e}")
                 flash('Failed to send password reset email. Please try again later.', 'danger')
         else:
             flash('No account found with that email address.', 'error')
+
         return redirect(url_for('forgot_password'))
+
     return render_template('accounts/forgot_password.html')
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
