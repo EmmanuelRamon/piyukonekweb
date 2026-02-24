@@ -2,7 +2,7 @@ import pymysql
 import resend
 pymysql.install_as_MySQLdb()
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
-from flask_mail import Mail, Message as MailMessage
+from flask_mail import Mail, Message as MailMessage # Gamitin ang alias na MailMessage
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
@@ -5240,8 +5240,8 @@ def forgot_password():
             reset_url = url_for('reset_password', token=token, _external=True)
             
             try:
-                # Pinalitan ang MailMessage ng Message at inayos ang indentation
-                msg = Message(
+                # Ginamit ang MailMessage (alias) para iwas conflict sa Chat model
+                msg = MailMessage(
                     subject='PiyuKonek Password Reset',
                     sender=app.config.get('MAIL_DEFAULT_SENDER'),
                     recipients=[email]
@@ -5252,7 +5252,8 @@ def forgot_password():
                 flash('A password reset link has been sent to your email address.', 'info')
                 
             except Exception as e:
-                print(f"[MAIL ERROR] {e}")
+                # Makikita ang detalye ng error sa Railway Logs
+                print(f"[MAIL ERROR] {e}") 
                 flash('Failed to send password reset email. Please try again later.', 'danger')
         else:
             flash('No account found with that email address.', 'error')
