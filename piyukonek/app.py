@@ -5235,7 +5235,11 @@ def forgot_password():
             token = serializer.dumps({'email': email, 'user_type': user_type}, salt='password-reset-salt')
             reset_url = url_for('reset_password', token=token, _external=True)
             try:
-                msg = MailMessage('PiyuKonek Password Reset', recipients=[email])
+                msg = MailMessage(
+    subject='PiyuKonek Password Reset',
+    sender=app.config.get('MAIL_DEFAULT_SENDER'),
+    recipients=[email]
+)
                 msg.body = f"Hello,\n\nTo reset your password, click the link below:\n{reset_url}\n\nIf you did not request this, please ignore this email.\n\n- PiyuKonek Team"
                 mail.send(msg)
                 flash('A password reset link has been sent to your email address.', 'info')
