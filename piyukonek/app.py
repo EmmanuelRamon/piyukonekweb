@@ -2467,27 +2467,28 @@ def admin_approve_student(student_id):
     student = Student.query.get_or_404(student_id)
     student.status = 'active'
     db.session.commit()
-    # Send email notification
-   # Palitan ang lines 2471-2474 sa image_c8ebb4.png nito:
-# Send email notification
+
+    # Send email notification using Resend
     try:
         import resend
         import os
-        
         resend.api_key = os.environ.get('RESEND_API_KEY')
         
         params = {
-            "from": os.environ.get('MAIL_DEFAULT_SENDER'), # noreply@piyukonekweb.site
+            "from": os.environ.get('MAIL_DEFAULT_SENDER'),
             "to": [student.email_address],
             "subject": "PiyuKonek Registration Approved",
-            "html": f"<p>Hello {student.fullname},</p><p>Your registration has been approved! You can now log in to your PiyuKonek account.</p>"
+            "html": f"""
+                <p>Hello {student.fullname},</p>
+                <p>Your registration has been approved! You can now log in to your PiyuKonek account.</p>
+                <p>- PiyuKonek Team</p>
+            """
         }
-        
         resend.Emails.send(params)
     except Exception as e:
-        print(f"[MAIL ERROR] {e}")
+        print(f"[RESEND ERROR] Approve notification: {e}")
 
-    # Notify all admins (Dapat pantay ang indentation nito sa 'try' block)
+    # Notify all admins
     for admin in Admin.query.all():
         notif = Notification(
             user_id=admin.id,
@@ -2502,63 +2503,45 @@ def admin_approve_student(student_id):
     db.session.commit()
     flash(f"Student {student.fullname} approved.", "success")
     return redirect(url_for('admin_user_approval'))
+
+
 @app.route('/admin/reject_student/<int:student_id>', methods=['POST'])
 @login_required('admin')
 def admin_reject_student(student_id):
     student = Student.query.get_or_404(student_id)
     rejection_reason = (request.form.get('rejection_reason') or '').strip()
+    
     if not rejection_reason:
         flash('Please select a reason for rejection.', 'error')
         return redirect(url_for('admin_user_approval'))
+
     student.status = 'rejected'
     db.session.commit()
-    # Send email notification to the rejected user
-    try:
-        msg = MailMessage(
-            'PiyuKonek Registration Not Approved',
-            recipients=[student.email_address]
-        )
-        msg.body = (
-            f"Hello {student.fullname},\n\n"
-            "Thank you for your interest in PiyuKonek.\n\n"
-            "After review, your registration could not be approved at this time.\n\n"
-            f"Reason: {rejection_reason}\n\n"
-            "If you believe this is an error or you have additional documents to submit, "
-            "please contact the administration.\n\n"
-            "- PiyuKonek Team"
-        )
-        mail.send(msg)
-    except Exception as e:
-        print(f"[MAIL ERROR] Reject notification to student: {e}")
-    flash(f"Student {student.fullname} rejected. They have been notified by email.", "danger")
-    return redirect(url_for('admin_user_approval'))
 
-@app.route('/admin/approve_ssc/<int:ssc_id>', methods=['POST'])
-@login_required('admin')
-def admin_approve_ssc(ssc_id):
-    ssc = SSC.query.get_or_404(ssc_id)
-    ssc.status = 'active'
-    db.session.commit()
-    # Send email notification
+    # Send email notification using Resend (Updated from SMTP)
     try:
-        msg = MailMessage('PiyuKonek Registration Approved', recipients=[ssc.email_address])
-        msg.body = f"Hello {ssc.fullname},\n\nYour registration as Guidance Council has been approved! You can now log in to your PiyuKonek account.\n\nThank you for registering.\n\n- PiyuKonek Team"
-        mail.send(msg)
+        import resend
+        import os
+        resend.api_key = os.environ.get('RESEND_API_KEY')
+
+        params = {
+            "from": os.environ.get('MAIL_DEFAULT_SENDER'),
+            "to": [student.email_address],
+            "subject": "PiyuKonek Registration Status",
+            "html": f"""
+                <p>Hello {student.fullname},</p>
+                <p>Thank you for your interest in PiyuKonek.</p>
+                <p>After review, your registration could not be approved at this time.</p>
+                <p><strong>Reason for rejection:</strong> {rejection_reason}</p>
+                <p>If you believe this is an error, please contact the administration.</p>
+                <p>- PiyuKonek Team</p>
+            """
+        }
+        resend.Emails.send(params)
     except Exception as e:
-        print(f"[MAIL ERROR] {e}")
-    # Notify all admins
-    for admin in Admin.query.all():
-        notif = Notification(
-            user_id=admin.id,
-            user_type='admin',
-            title='New SSC Registration',
-            message=f'{ssc.fullname} has registered as a new Guidance Staff.',
-            notification_type='user',
-            created_at=datetime.utcnow()
-        )
-        db.session.add(notif)
-    db.session.commit()
-    flash(f"SSC {ssc.fullname} approved.", "success")
+        print(f"[RESEND ERROR] Reject notification: {e}")
+
+    flash(f"Student {student.fullname} rejected. They have been notified by email.", "danger")
     return redirect(url_for('admin_user_approval'))
 
 @app.route('/admin/reject_ssc/<int:ssc_id>', methods=['POST'])
