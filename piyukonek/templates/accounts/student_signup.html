@@ -1154,6 +1154,34 @@
         inputElement.classList.remove('error');
       }
     }
+    
+  (function () {
+    function togglePassword(btn) {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (!input) return;
+
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+
+      const icon = btn.querySelector('i');
+      if (icon) {
+        // Toggle between the open eye and slashed eye icons
+        icon.classList.toggle('fa-eye', !isHidden);
+        icon.classList.toggle('fa-eye-slash', isHidden);
+      }
+
+      btn.setAttribute('aria-pressed', String(isHidden));
+      btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      btn.title = isHidden ? 'Hide password' : 'Show password';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+        btn.addEventListener('click', () => togglePassword(btn));
+      });
+    });
+  })();
 
     // Add event listener to department dropdown
     document.addEventListener('DOMContentLoaded', function() {
