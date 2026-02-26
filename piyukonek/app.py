@@ -2568,7 +2568,7 @@ def admin_reject_ssc(ssc_id):
     # Send Notification via Resend
     try:
         params = {
-            "from": "PiyuKonek <onboarding@resend.dev>", # Use verified domain if you have one
+            "from": "PiyuKonek <noreply@piyukonekweb.site>", # Use verified domain if you have one
             "to": [ssc.email_address],
             "subject": "PiyuKonek Guidance Registration Not Approved",
             "html": f"""
