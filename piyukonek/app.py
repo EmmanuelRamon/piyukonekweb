@@ -2603,6 +2603,35 @@ def admin_reject_ssc(ssc_id):
 
     return redirect(url_for('admin_user_approval'))
 
+@app.route('/admin/approve_ssc/<int:ssc_id>', methods=['POST'])
+@login_required('admin')
+def admin_approve_ssc(ssc_id):
+    ssc = SSC.query.get_or_404(ssc_id)
+    ssc.status = 'active'
+    
+    try:
+        db.session.commit()
+        
+        # Notify via Resend
+        params = {
+            "from": "PiyuKonek <noreply@piyukonekweb.site>",
+            "to": [ssc.email_address],
+            "subject": "PiyuKonek Guidance Account Approved",
+            "html": f"""
+                <p>Hello {ssc.fullname},</p>
+                <p>Your account as Guidance staff has been approved. You can now log in.</p>
+                <p>- PiyuKonek Team</p>
+            """
+        }
+        resend.Emails.send(params)
+        flash(f"SSC {ssc.fullname} approved successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] SSC Approval: {e}")
+        flash("An error occurred during approval.", "danger")
+        
+    return redirect(url_for('admin_user_approval'))
+
 @app.route('/ssc/concern/<int:concern_id>')
 @login_required('ssc')
 def ssc_concern_detail(concern_id):
