@@ -2544,35 +2544,49 @@ def admin_reject_student(student_id):
     flash(f"Student {student.fullname} rejected. They have been notified by email.", "danger")
     return redirect(url_for('admin_user_approval'))
 
+import resend
+import os
+from flask import current_app
+
+# Ensure your API key is set (usually in your .env or app config)
+resend.api_key = os.getenv('RESEND_API_KEY')
+
 @app.route('/admin/reject_ssc/<int:ssc_id>', methods=['POST'])
 @login_required('admin')
 def admin_reject_ssc(ssc_id):
     ssc = SSC.query.get_or_404(ssc_id)
     rejection_reason = (request.form.get('rejection_reason') or '').strip()
+    
     if not rejection_reason:
         flash('Please select a reason for rejection.', 'error')
         return redirect(url_for('admin_user_approval'))
+
+    # Update Database
     ssc.status = 'rejected'
     db.session.commit()
-    # Send email notification to the rejected user
+
+    # Send Notification via Resend
     try:
-        msg = MailMessage(
-            'PiyuKonek Guidance Registration Not Approved',
-            recipients=[ssc.email_address]
-        )
-        msg.body = (
-            f"Hello {ssc.fullname},\n\n"
-            "Thank you for your interest in joining as Guidance Council on PiyuKonek.\n\n"
-            "After review, your registration could not be approved at this time.\n\n"
-            f"Reason: {rejection_reason}\n\n"
-            "If you believe this is an error or you have additional information to provide, "
-            "please contact the administration.\n\n"
-            "- PiyuKonek Team"
-        )
-        mail.send(msg)
+        params = {
+            "from": "PiyuKonek <onboarding@resend.dev>", # Use verified domain if you have one
+            "to": [ssc.email_address],
+            "subject": "PiyuKonek Guidance Registration Not Approved",
+            "html": f"""
+                <p>Hello {ssc.fullname},</p>
+                <p>Thank you for your interest in joining PiyuKonek.</p>
+                <p><strong>Reason for rejection:</strong> {rejection_reason}</p>
+                <p>If you believe this is an error, please contact administration.</p>
+                <p>- PiyuKonek Team</p>
+            """
+        }
+        resend.Emails.send(params)
+        flash(f"User {ssc.fullname} rejected and notified.", "success")
+        
     except Exception as e:
-        print(f"[MAIL ERROR] Reject notification to SSC: {e}")
-    flash(f"Guidance user {ssc.fullname} rejected. They have been notified by email.", "danger")
+        # This will now print the SPECIFIC Resend error to your terminal
+        print(f"[RESEND ERROR]: {e}")
+        flash(f"User rejected, but email failed: {str(e)}", "warning")
+
     return redirect(url_for('admin_user_approval'))
 
 @app.route('/ssc/concern/<int:concern_id>')
