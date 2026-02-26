@@ -952,14 +952,25 @@ def resend_ssc_otp():
         session['ssc_otp'] = new_otp
         email = session['ssc_data']['email_address']
         fullname = session['ssc_data']['fullname']
+        
         try:
-            msg = MailMessage('Your New SSC OTP Code', recipients=[email])
-            msg.body = f"Hello {fullname},\n\nYour new OTP code is: {new_otp}"
-            mail.send(msg)
+            # RESEND API CALL REPLACING MAILMESSAGE
+            params = {
+                "from": "PiyuKonek <noreply@piyukonekweb.site>",
+                "to": [email],
+                "subject": "Your New SSC OTP Code",
+                "html": f"""
+                    <p>Hello {fullname},</p>
+                    <p>Your new OTP code is: <strong>{new_otp}</strong></p>
+                """
+            }
+            resend.Emails.send(params)
+            
             flash("New OTP has been sent to your email.", "info")
         except Exception as e:
-            print(f"[MAIL ERROR] {e}")
+            print(f"[RESEND ERROR] {e}")
             flash("Failed to send new OTP email.", "danger")
+            
         return render_template('accounts/ssc_otp.html')
     return redirect(url_for('ssc_signup'))
 
