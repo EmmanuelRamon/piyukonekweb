@@ -819,12 +819,14 @@ def email_exists_in_other_roles(email, current_role=None):
 def ssc_signup():
     if request.method == 'POST':
         print("[DEBUG] SSC signup form submitted")
-        # Gracefully handle missing fullname field by reconstructing it
+        
+        # Name Reconstruction
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         fullname = request.form.get('fullname', '').strip()
         if not fullname:
             fullname = ' '.join(filter(None, [first_name, last_name])).strip()
+            
         if not fullname:
             flash("Please provide your first and last name.", "error")
             return redirect(url_for('ssc_signup'))
@@ -834,35 +836,23 @@ def ssc_signup():
         position = request.form.get('position', '').strip()
         password = request.form.get('password', '')
 
-        # Password validation (optional, can add more rules)
-        if len(password) < 8:
-            flash("Password must be at least 8 characters long.", "error")
-            return redirect(url_for('ssc_signup'))
-        if not password.isalnum():
-            flash("Password must contain only letters and numbers (alphanumeric).", "error")
+        # Validations
+        if len(password) < 8 or not password.isalnum():
+            flash("Password must be at least 8 alphanumeric characters.", "error")
             return redirect(url_for('ssc_signup'))
 
-        # Duplicate check
-        if SSC.query.filter_by(username=username).first():
-            flash("Username already exists. Please choose another one.", "error")
-            return redirect(url_for('ssc_signup'))
-        if SSC.query.filter_by(email_address=email).first():
-            flash("Email already registered. Please use a different email.", "error")
+        if SSC.query.filter_by(username=username).first() or SSC.query.filter_by(email_address=email).first():
+            flash("Username or Email already exists.", "error")
             return redirect(url_for('ssc_signup'))
 
-        if email_exists_in_other_roles(email, current_role='ssc'):
-            flash("Email is already used by another account type. Please use a different email.", "error")
-            return redirect(url_for('ssc_signup'))
-
-        # Handle profile image upload (optional)
+        # Handle profile image
         profile_image_file = request.files.get('profile_image')
         profile_image_filename = None
         if profile_image_file and profile_image_file.filename:
-            print(f"[DEBUG] Profile image file received: {profile_image_file.filename}")
             profile_image_filename = f"ssc_profile_{username}_{secure_filename(profile_image_file.filename)}"
-            profile_image_path = os.path.join(app.config['UPLOAD_FOLDER'], profile_image_filename)
-            profile_image_file.save(profile_image_path)
-            print(f"[DEBUG] Profile image saved as: {profile_image_filename}")
+            profile_image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], profile_image_filename))
+
+        # OTP Generation
         otp = str(random.randint(100000, 999999))
         session['ssc_data'] = {
             'fullname': fullname,
@@ -873,17 +863,35 @@ def ssc_signup():
             'profile_image': profile_image_filename
         }
         session['ssc_otp'] = otp
+
+        # FIXED: Sending OTP via Resend instead of MailMessage
         try:
             print(f"[DEBUG] Attempting to send OTP email to: {email}")
-            msg = MailMessage('Your Guidance OTP Verification Code', recipients=[email])
-            msg.body = f"Hello {fullname},\n\nYour OTP code is: {otp}\n\nThank you for registering as Guidance staff."
-            mail.send(msg)
-            print("[DEBUG] OTP email sent successfully")
+            
+            params = {
+                "from": "PiyuKonek <noreply@piyukonekweb.site>",
+                "to": [email],
+                "subject": "Your Guidance OTP Verification Code",
+                "html": f"""
+                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
+                        <h2 style="color: #2e7d32;">Verify Your Account</h2>
+                        <p>Hello <strong>{fullname}</strong>,</p>
+                        <p>Your OTP code is: <strong style="font-size: 24px; color: #333;">{otp}</strong></p>
+                        <p>Thank you for registering as Guidance staff.</p>
+                    </div>
+                """
+            }
+            
+            resend.Emails.send(params)
+            print("[DEBUG] OTP email sent successfully via Resend")
             flash("OTP has been sent to your email address.", "info")
+            
         except Exception as e:
-            print(f"[MAIL ERROR] {e}")
+            print(f"[RESEND ERROR] {e}")
             flash("Failed to send OTP. Please check email configuration.", "danger")
+
         return render_template('accounts/ssc_otp.html')
+
     return render_template('accounts/ssc_signup.html')
 
 @app.route('/verify_ssc_otp', methods=['POST'])
