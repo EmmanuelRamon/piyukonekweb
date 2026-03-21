@@ -1,16 +1,10 @@
-# Railway/Nixpacks config for Piyukonek Flask app
-
+# Simpleng config para hindi malito si Railway
 [variables]
-    # Pinipilit nito ang Mise na gumamit ng stable version
     PYTHON_VERSION = "3.11"
-
-[phases.setup]
-    # Tinatanggal natin ang nixPkgs para Mise ang mag-handle nang malinis
-    # O kung gusto mo ng Nix, siguraduhing "python311" lang talaga
-    nixPkgs = ["python311"]
 
 [phases.install]
     cmds = ["pip install -r requirements.txt"]
 
 [start]
+    # Siguraduhin na tama ang path ng app mo dito
     cmd = "gunicorn -b 0.0.0.0:${PORT:-5000} piyukonek.app:app"
